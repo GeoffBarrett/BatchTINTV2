@@ -131,7 +131,8 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
             self.Multithread.setDisabled(1)
 
         # ------------------------------------ version information -------------------------------------------------
-        mod_date = time.ctime(os.path.getmtime(os.getcwd() + "\\BatchSort.py"))  # finds the modifcation date of the program
+        # finds the modifcation date of the program
+        mod_date = time.ctime(os.path.getmtime(os.getcwd() + "\\BatchSort.py"))
         vers_label = QtGui.QLabel("BatchTINT V2.0 - Last Updated: " + mod_date)  # creates a label with that information
 
         # ------------------- page layout ----------------------------------------
