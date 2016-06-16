@@ -32,7 +32,7 @@ If you want it on your Desktop type in the following: cd "C:\Users\ [user name]\
 
 4) Then your next step will be to clone the repository by typing in the following to your Command Prompt:
 
-git clone https://github.com/GeoffBarrett/BatchTINT.git
+git clone https://github.com/GeoffBarrett/BatchTINTV2.git
 
 ***Note: This may take a few minutes. If there is an error produced by the Command Prompt saying the following:*** 
 
@@ -82,7 +82,7 @@ python -m pip install [wheel file path]
 ***If you have spaces in your wheel file path make sure to surround the path by quotes***
 example: 
 
-python -m pip install "C:\Users\My Name\Desktop\GitHub\"
+python -m pip install "C:\Users\My Name\Desktop\GitHub\file.whl"
 
 The wheel files are the following:
 
@@ -109,8 +109,8 @@ Add the following path for 64-bit systems: C:\Program Files (x86)\Axona\Tint
 Now in your Command Prompt you can type the following in order to run the GUI:
 The easiest way to run it is to create a '.bat' file on the desktop that contains the following information:
 
-cd "[pathway to your BatchTINT folder]"
-python BatchSort.py
+cd "[pathway to your BatchTINTV2 folder]"
+python BatchSortV2.py
 exit
 
 When you click this .bat file it will run the program.
