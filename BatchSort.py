@@ -356,7 +356,7 @@ class Settings_W(QtGui.QTabWidget):
         self.reporting = {}
 
         self.default_adv = {'MaxPos': 30, 'nStarts': 1, 'RandomSeed': 1,
-                       'DistThresh': 6907755, 'PenaltyK': 1.0, 'PenaltyKLogN': 0.0,
+                       'DistThresh': 6.907755, 'PenaltyK': 1.0, 'PenaltyKLogN': 0.0,
                        'ChangedThresh': 0.05, 'MaxIter': 500, 'SplitEvery': 40,
                        'FullStepEvery': 20, 'Subset': 1}
 
