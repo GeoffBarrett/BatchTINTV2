@@ -1,5 +1,5 @@
-# About BatchTINT
-BatchTINT is A GUI created by the Taub Institute in order to create an end-user friendly batch processing solution to complement Axona's new command line modification of TINT.
+# About BatchTINTV2
+BatchTINTV2 is A GUI created by the Taub Institute in order to create an end-user friendly batch processing solution to complement Axona's new command line modification of TINT.
 
 This GUI will allow the user to define a directory. Within this directory it will be continuously (unless closed) searching for new files to analyze via Tint. The user simply drags a folder containing the appropriate '.set', '.eegx', '.pos', and '.x' tetrode files and the GUI will automatically detect these files and take care of the rest.
 
@@ -136,6 +136,7 @@ There is also a Multi-Thread checkbox. Once this is checked you will be able to 
 
 - Add multi-threading so it can analyze multiple tetrode files at the same time
 - Add a notification system so it can e-mail/text if the analysis has been completed or if an error has occured
+- Add a queue system so that users can define which order they want the files to be processed in
 
 # Contact
 
