@@ -124,6 +124,8 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
         try:
             with open(self.settings_fname, 'r+') as filename:
                 settings = json.load(filename)
+                self.core_num.setText(settings['Cores'])
+                self.Multithread.setText(settings['NumThreads'])
                 if settings['Silent'] == 1:
                     self.silent_cb.toggle()
                 if settings['Multi'] == 1:
@@ -131,9 +133,12 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                 if settings['Multi'] == 0:
                     self.core_num.setDisabled(1)
 
+
         except FileNotFoundError:
             self.silent_cb.toggle()
             self.core_num.setDisabled(1)
+            self.core_num.setText('4')
+            self.Multithread.setText('1')
 
         # ------------------------------------ version information -------------------------------------------------
         # finds the modifcation date of the program
@@ -179,9 +184,14 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
 
     def run_klusta(self, directory):  # function that runs klustakwik
         klusta_ready = True
-
         with open(self.settings_fname, 'r+') as filename:
             self.settings = json.load(filename)
+        self.settings['NumThreads'] = str(self.Multithread.text())
+        self.settings['Cores'] = str(self.core_num.text())
+
+        with open(self.settings_fname, 'w') as filename:
+            json.dump(self.settings, filename)
+
         if self.settings['NumFet'] > 4:
             fet_msg = QtGui.QMessageBox.question(self, "No Chosen Directory: BatchTINT",
                                                 "You have chosen more than four features,\n clustering will take a long time.\n"
@@ -198,6 +208,20 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                                                 QtGui.QMessageBox.Ok )
             if directory_msg == QtGui.QMessageBox.Ok:
                 pass
+        elif 'Google Drive' in directory:
+            directory_msg = QtGui.QMessageBox.question(self, "Google Drive Directory: BatchTINT",
+                                                       "You have not chosen a directory within Google Drive,\n"
+                                                       "be aware that during testing we have experienced\n"
+                                                       "permissions errors while using Google Drive directories\n"
+                                                       "that would result in BatchTINTV2 not being able to move\n"
+                                                       "the files to the Processed folder (and stopping the GUI),\n"
+                                                       "do you want to continue?",
+                                                       QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+            if directory_msg == QtGui.QMessageBox.Yes:
+                klusta_ready = True
+            elif directory_msg == QtGui.QMessageBox.No:
+                klusta_ready = False
+
 
         elif klusta_ready:
             self.hide()
@@ -690,6 +714,8 @@ class Settings_W(QtGui.QTabWidget):
                 self.settings['Silent'] = 1
                 self.settings['Multi'] = 0
                 self.settings['UseFeatures'] = '1111111111111'
+                self.settings['NumThreads'] = 1
+                self.settings['Cores'] = 4
 
                 json.dump(self.settings, filename)  # save the default values to this file
 

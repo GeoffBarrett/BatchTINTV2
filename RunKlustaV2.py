@@ -74,25 +74,25 @@ class runKlusta():
                 for u in tet_list:
                     q.put(u)
 
-                ThreadCount = 4
+                ThreadCount = int(self.settings['NumThreads'])
 
                 if ThreadCount > len(tet_list):
                     ThreadCount = len(tet_list)
 
-                Threads = []
-                for i in range(ThreadCount):
-                    t = threading.Thread(target=runKlusta.analyze_tet, args=(self, q, set_path, set_file, f_list,
-                                                                             dir_new, log_f_dir, ini_f_dir))
-                    time.sleep(0.5)
-                    t.daemon = True
-                    t.start()
-                    Threads.append(t)
-                # s = q.join()
-                # for i in range(ThreadCount):
-                #     q.put(None)
+                while not q.empty():
+                    Threads = []
+                    for i in range(ThreadCount):
+                        t = threading.Thread(target=runKlusta.analyze_tet, args=(self, q, set_path, set_file, f_list,
+                                                                                 dir_new, log_f_dir, ini_f_dir))
+                        time.sleep(0.5)
+                        t.daemon = True
+                        t.start()
+                        Threads.append(t)
 
-                for t in Threads:
-                    t.join()
+                    # q.join()
+
+                    for t in Threads:
+                        t.join()
 
 
         cur_time = datetime.datetime.now().time()
