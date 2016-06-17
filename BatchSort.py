@@ -1,5 +1,5 @@
 import sys, json, time, os, subprocess, functools, datetime, RunKlustaV2
-#from RunKlustaV2.runKlusta import klusta, analyze_tet
+# from RunKlustaV2.runKlusta import klusta, analyze_tet
 from PyQt4 import QtGui, QtCore
 from PIL import Image
 
@@ -89,18 +89,23 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
         self.silent_cb = QtGui.QCheckBox('Run Silently')
         self.silent_cb.setToolTip("Check if you want Tint to run in the background.")
 
-        self.Multithread_cb = QtGui.QCheckBox('Multi-thread')
+        self.Multithread_cb = QtGui.QCheckBox('Multiprocessing')
         self.Multithread_cb.setToolTip('Check if you want to run multiple tetrodes simultaneously')
 
-        Multithread_l = QtGui.QLabel('# Threads:')
-        Multithread_l.setToolTip('Input the number of tetrodes you want to run simultaneously')
+        core_num_l = QtGui.QLabel('Cores (#):')
+        core_num_l.setToolTip('Generally the number of processes that multiprocessing should use is \n'
+                                   'equal to the number of cores your computer has.')
+
+        self.core_num = QtGui.QLineEdit()
+
+        Multithread_l = QtGui.QLabel('Simultaneous Tetrodes (#):')
+        Multithread_l.setToolTip('Input the number of tetrodes you want to analyze simultaneously')
 
         self.Multithread = QtGui.QLineEdit()
 
         Multi_layout = QtGui.QHBoxLayout()
 
-
-        for order in [self.Multithread_cb, Multithread_l, self.Multithread]:
+        for order in [self.Multithread_cb, core_num_l, self.core_num, Multithread_l, self.Multithread]:
             if 'Layout' in order.__str__():
                 Multi_layout.addLayout(order)
                 # Multi_layout.addStretch(1)
@@ -124,11 +129,11 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                 if settings['Multi'] == 1:
                     self.Multithread_cb.toggle()
                 if settings['Multi'] == 0:
-                    self.Multithread.setDisabled(1)
+                    self.core_num.setDisabled(1)
 
         except FileNotFoundError:
             self.silent_cb.toggle()
-            self.Multithread.setDisabled(1)
+            self.core_num.setDisabled(1)
 
         # ------------------------------------ version information -------------------------------------------------
         # finds the modifcation date of the program
@@ -214,7 +219,7 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
 
             # ----------- cycle through each file and find the tetrode files ------------------------------------------
 
-            for expt in expt_list: # finding all the folders within the directory
+            for expt in expt_list:  # finding all the folders within the directory
 
                 try:
 
@@ -230,7 +235,6 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                         continue
 
                     RunKlustaV2.runKlusta.klusta(self, expt, directory)  # runs the function that will perform the klusta'ing
-                    #klusta(self, expt, directory)
 
                     dir_new = os.path.join(directory, expt)
                     proc_f_dir = os.path.join(directory, 'Processed')
@@ -261,9 +265,7 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                     newcontents = os.listdir(directory)  # lists the new contents of the directory including added folders
                     added = list(set(newcontents).difference(contents)) # finds the differences between the contents to state the files that were added
                     # added = list(added) #converts added to a list
-                    if added: # runs if added exists as a variable
-
-
+                    if added:  # runs if added exists as a variable
 
                         for new_file in added: # cycles through the added files to analyze
 
@@ -277,7 +279,6 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                             count_old = 0
 
                             while file_complete == 0:
-                                time.sleep(45) # waits x amount of seconds
                                 total_size = 0
                                 count_old = len(start_path)
                                 # come up with way to have python wait until all the files have been transferred to the directory
@@ -286,12 +287,13 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                                         fp = os.path.join(dirpath, f)
                                         total_size += os.path.getsize(fp)
                                 cur_time = datetime.datetime.now().time()
-                                download_msg = new_file + ' is still downloading... (' + str(total_size) +\
+                                download_msg = new_file + ' is downloading... (' + str(total_size) +\
                                                ' bytes downloaded)!'
                                 print('[' + str(cur_time)[:8] + ']: ' + download_msg)
                                 # if total_size > total_size_old and len(start_path) > count_old:
                                 if total_size > total_size_old:
                                     total_size_old = total_size
+                                    time.sleep(45)  # waits x amount of seconds
                                 elif total_size == total_size_old:
                                     cur_time = datetime.datetime.now().time()
                                     download_complete_msg = new_file + ' has finished downloading!'
@@ -312,7 +314,14 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
 
                                 dir_new = os.path.join(directory, expt)
                                 proc_f_dir = os.path.join(directory, 'Processed')
-                                os.rename(dir_new, os.path.join(proc_f_dir, expt))
+                                processing = 1
+                                while processing == 1:
+                                    processing = 0
+                                    try:
+                                        # moves the entire folder to the processed folder
+                                        os.rename(dir_new, os.path.join(proc_f_dir, expt))
+                                    except PermissionError:
+                                        processing = 1
 
                             except NotADirectoryError:
                                 print(directory + ' is not a directory, skipping analysis!')
@@ -434,9 +443,13 @@ class Settings_W(QtGui.QTabWidget):
                 continue
             self.position[option] = position
             self.report_cbs[position] = QtGui.QCheckBox(option)
-            grid_report.addWidget(self.report_cbs[position], position[0], position[1], QtCore.Qt.AlignCenter)
+            grid_report.addWidget(self.report_cbs[position], *position)
             self.report_cbs[position].stateChanged.connect(
                 functools.partial(self.reporting_options, option, position))
+
+        grid_lay = QtGui.QHBoxLayout()
+        grid_lay.addWidget(report_l)
+        grid_lay.addLayout(grid_report)
 
         # --------------------------Channels to Include-------------------------------------------
 
@@ -585,10 +598,10 @@ class Settings_W(QtGui.QTabWidget):
         # -------------------------- layouts ----------------------------------------------------
 
         # basic_lay_order = [chan_name_lay, clust_feat_lay, clust_maxmin_lay, basic_butn_lay]
-        basic_lay_order = [num_tet_lay, chan_name_lay, clust_feat_lay, grid_report, basic_butn_lay]
+        basic_lay_order = [num_tet_lay, chan_name_lay, clust_feat_lay, grid_lay, basic_butn_lay]
         basic_lay = QtGui.QVBoxLayout()
 
-        #basic_lay.addStretch(1)
+        # basic_lay.addStretch(1)
         for order in basic_lay_order:
             if 'Layout' in order.__str__():
                 basic_lay.addLayout(order)
@@ -987,10 +1000,10 @@ def Multi(self, state):
         settings = json.load(filename)
         if state == True:
             settings['Multi'] = 1
-            self.Multithread.setEnabled(1)
+            self.core_num.setEnabled(1)
         else:
             settings['Multi'] = 0
-            self.Multithread.setDisabled(1)
+            self.core_num.setDisabled(1)
     with open(self.settings_fname, 'w') as filename:
         json.dump(settings, filename)
 
