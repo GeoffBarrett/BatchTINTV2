@@ -312,14 +312,13 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                                 RunKlustaV2.runKlusta.klusta(self, new_file,
                                                              directory)  # runs the function that will perform the klusta'ing
 
-                                dir_new = os.path.join(directory, expt)
                                 proc_f_dir = os.path.join(directory, 'Processed')
                                 processing = 1
                                 while processing == 1:
                                     processing = 0
                                     try:
                                         # moves the entire folder to the processed folder
-                                        os.rename(dir_new, os.path.join(proc_f_dir, expt))
+                                        os.rename(dir_new, os.path.join(proc_f_dir, new_file))
                                     except PermissionError:
                                         processing = 1
 
@@ -407,7 +406,7 @@ class Settings_W(QtGui.QTabWidget):
 
         self.clust_ft_cbs = {}
 
-        positions = [(i,j) for i in range(4) for j in range(4)]
+        positions = [(i, j) for i in range(4) for j in range(4)]
 
         for position, clust_ft_name in zip(positions, self.clust_ft_names):
 
@@ -419,7 +418,7 @@ class Settings_W(QtGui.QTabWidget):
             self.clust_ft_cbs[position].stateChanged.connect(
                 functools.partial(self.channel_feats, clust_ft_name, position))
 
-        #self.clust_ft_cbs.toggle()
+        # self.clust_ft_cbs.toggle()
 
         clust_feat_lay = QtGui.QHBoxLayout()
         clust_feat_lay.addWidget(clust_l)
@@ -539,32 +538,32 @@ class Settings_W(QtGui.QTabWidget):
         row1order = [maxposclust_l, self.maxpos, chThresh_l, self.chThresh]
         for order in row1order:
             row1.addWidget(order)
-            #row1.addStretch(1)
+            # row1.addStretch(1)
 
         row2order = [nStarts_l, self.nStarts, MaxIter_l, self.Maxiter]
         for order in row2order:
             row2.addWidget(order)
-            #row2.addStretch(1)
+            # row2.addStretch(1)
 
         row3order = [RandomSeed_l, self.RandomSeed, SplitEvery_l, self.SplitEvery]
         for order in row3order:
             row3.addWidget(order)
-            #row3.addStretch(1)
+            # row3.addStretch(1)
 
         row4order = [DistThresh_l, self.DistThresh, FullStepEvery_l, self.FullStepEvery]
         for order in row4order:
             row4.addWidget(order)
-            #row4.addStretch(1)
+            # row4.addStretch(1)
 
         row5order = [PenaltyK_l, self.PenaltyK, Subset_l, self.Subset]
         for order in row5order:
             row5.addWidget(order)
-            #row5.addStretch(1)
+            # row5.addStretch(1)
 
         row6order = [PenaltyKLogN_l, self.PenaltyKLogN]
         for order in row6order:
             row6.addWidget(order)
-            #row6.addStretch(1)
+            # row6.addStretch(1)
 
         # ------------------------ buttons ----------------------------------------------------
         self.basicdefaultbtn = QtGui.QPushButton("Default", tab1)
@@ -587,7 +586,7 @@ class Settings_W(QtGui.QTabWidget):
         basic_butn_lay = QtGui.QHBoxLayout()
         for order in basic_butn_order:
             basic_butn_lay.addWidget(order, 0, QtCore.Qt.AlignCenter)
-           # basic_butn_lay.addStretch(1)
+            # basic_butn_lay.addStretch(1)
 
         adv_butn_order = [self.apply_tab2btn, self.advanceddefaultbtn, self.backbtn2]
         adv_butn_lay = QtGui.QHBoxLayout()
@@ -720,7 +719,7 @@ class Settings_W(QtGui.QTabWidget):
                     if int(self.settings[option]) == 1:
                         self.report_cbs[self.position[option]].toggle()
         center(self)
-        #self.show()
+        # self.show()
 
     def reporting_options(self, option, position):
         if self.report_cbs[position].isChecked():
@@ -827,7 +826,7 @@ class Settings_W(QtGui.QTabWidget):
             feat_inc = [feat for feat in self.clust_ft_names if self.settings[feat] == 1]
 
             UseFeat = ''
-            start_feat = 1
+            # start_feat = 1
             for i in range(len(self.chan_names)):
                 for j in range(len(feat_inc)):
                     if str(i+1) in chan_inc:
@@ -864,11 +863,12 @@ class Settings_W(QtGui.QTabWidget):
         with open(self.settings_fname, 'w') as filename:
             json.dump(self.settings, filename)  # save the default values to this file
 
+
 class Choose_Dir(QtGui.QWidget):
     def __init__(self):
         super(Choose_Dir, self).__init__()
         background(self)
-        #deskW, deskH = background.Background(self)
+        # deskW, deskH = background.Background(self)
         width = self.deskW / 5
         height = self.deskH / 5
         self.setGeometry(0, 0, width, height)
@@ -889,7 +889,7 @@ class Choose_Dir(QtGui.QWidget):
         self.dirbtn.setToolTip('Click to choose a directory!')
         # dirbtn.clicked.connect(self.new_dir)
 
-        cur_dir_t = QtGui.QLabel('Current Directory:') #the label saying Current Directory
+        cur_dir_t = QtGui.QLabel('Current Directory:')  # the label saying Current Directory
         self.cur_dir_e = QtGui.QLineEdit() # the label that states the current directory
         self.cur_dir_e.setText(cur_dir_name)
         self.cur_dir_e.setAlignment(QtCore.Qt.AlignHCenter)
@@ -909,7 +909,6 @@ class Choose_Dir(QtGui.QWidget):
 
         layout_dir = QtGui.QVBoxLayout()
 
-
         layout_h1 = QtGui.QHBoxLayout()
         layout_h1.addWidget(cur_dir_t)
         layout_h1.addWidget(self.cur_dir_e)
@@ -920,10 +919,10 @@ class Choose_Dir(QtGui.QWidget):
         btn_layout = QtGui.QHBoxLayout()
         btn_order = [self.dirbtn, applybtn, self.backbtn]
 
-        #btn_layout.addStretch(1)
+        # btn_layout.addStretch(1)
         for butn in btn_order:
             btn_layout.addWidget(butn)
-            #btn_layout.addStretch(1)
+            # btn_layout.addStretch(1)
 
         layout_order = [instr, layout_h1, self.save_cb, btn_layout]
 
@@ -936,8 +935,7 @@ class Choose_Dir(QtGui.QWidget):
         self.setLayout(layout_dir)
 
         center(self)
-        #self.show()
-
+        # self.show()
 
     def save_dir(self,state):
         self.cur_dir_name = str(self.cur_dir_e.text())

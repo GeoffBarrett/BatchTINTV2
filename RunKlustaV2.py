@@ -39,7 +39,10 @@ class runKlusta():
 
         set_files = [file for file in f_list if '.set' in file]
         cur_time = datetime.datetime.now().time()
-        set_msg = 'There is(are) ' + str(len(set_files)) + " '.set' file(s) in this directory"
+        if len(set_files) > 1:
+            set_msg = 'There are ' + str(len(set_files)) + " '.set' files in this directory"
+        else:
+            set_msg = 'There is ' + str(len(set_files)) + " '.set' file in this directory"
         print('[' + str(cur_time)[:8] + ']: ' + set_msg)
 
         for i in range(len(set_files)):
