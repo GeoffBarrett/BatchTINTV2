@@ -56,11 +56,11 @@ git clone https://github.com/GeoffBarrett/BatchTINTV2.git
   
   e) If the variable is a single line of paths then append the two paths to the end of the variable, 
   you will need to add a semicolon to separate each path (existing path;git-core path;bin path).
-  If the window you are looking at has a list of the different paths then you will simply add the two paths separately.
+  If the window you are looking at has a list of the different paths, then you will simply add the two paths separately.
   
   f) Click apply/okay to confirm the addition of these paths, close the existing Command Prompt, open a new Command Prompt and the commands will now be available
 
-5) If you are using Python 3.4.4 I have included two wheel (.whl) files in the GitHub repository for PyQt4 that will need
+5) If you are using Python 3.4.4 I have included two wheel (‘.whl’) files in the GitHub repository for PyQt4 that will need
 to be installed via the Command Prompt.
 
 If you have not added the Python 3.4.4 path to the system variable (as done for the GitHub path) then you will have to do the same.
@@ -90,7 +90,7 @@ The wheel files are the following:
 
 32-bit PC: use the PyQt4-4.11.4-cp34-none-win32.whl file
 
-***Note: if you are using Python 3.5 you can find those .whl files here: http://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4***
+***Note: if you are using Python 3.5 you can find those ‘.whl’ files here: http://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4***
 
 6) Install the python library responsible for some of the images on the GUI
 
@@ -116,7 +116,7 @@ exit
 When you click this .bat file it will run the program.
 
 Now you can see a main window of the GUI that states the current directory (if it's your first time opening the program, it will say 
-there is no directory chosen), as a few checkboxes, and a few buttons at the bottom. You are going to want to click the 'choose directory' button and navigate to a directory that this program will analyze. For our lab we use TeamViewer to transfer files to a local drive on the machine that is running the GUI at all times, but you can use whichever method is easiest for you (Dropbox, mapped network drives, etc). ***Note: I have tested Google Drive and sometimes there are Permission Errors involved, therefore the files will be analyzed, but they won't be moved into the 'Processed Folder'. I'd avoid Google Drives, if I get around to it I can make the GUI save the files locally, perform the analysis, and then move the files back to the Google Drive. Also, if you do not click the 'apply' button on the Choose Directory window, the directory will not be applied, so make sure you click 'apply' and not 'back'***
+there is no directory chosen), as a few checkboxes, and a few buttons at the bottom. You are going to want to click the 'choose directory' button and navigate to a directory that this program will analyze. For our lab we use TeamViewer to transfer files to a local drive on the machine that is running the GUI at all times, but you can use whichever method is easiest for you (Dropbox, mapped network drives, etc.). ***Note: I have tested Google Drive and sometimes there are Permission Errors involved, therefore the files will be analyzed, but they won't be moved into the 'Processed Folder'. I'd avoid Google Drives, if I get around to it I can make the GUI save the files locally, perform the analysis, and then move the files back to the Google Drive. Also, if you do not click the 'apply' button on the Choose Directory window, the directory will not be applied, so make sure you click 'apply' and not 'back'***
 
 Once a directory has been chosen you can now look through the Klusta Settings (by clicking the Klusta Settings button) and look through the basic/advanced settings options. The format should look familiar as it is a replica (almost) of that which you've seen while using Tint.
 
@@ -124,17 +124,17 @@ It is important to change the ***Number of Tetrodes*** option in the 'basic' tab
 
 Once these settings have been applied, the values will be saved for the next time you open up the GUI.
 
-How this works is the GUI will look in the chosen directory for new folders (and existing folders). On start-up it will look through existing folders already in the directory to check if any of them need analysis. Once the analysis of these files has been completed it will wait new folders to be detected. Once anew folder has been detected it will look for the appropriate files corresponding to the '.set' files it detects. One at a time these tetrode files will be analyzed via KlustaKwik through Tint. ***Note: if there is an existing .cut file for a corresponding tetrode, the analysis of this tetrode will be skipped.*** A Command Prompt will print messages stating which file it is analyzing, if there is a new file, etc. ***Do not close this Command Prompt or the GUI will stop***.
+How this works is the GUI will look in the chosen directory for new folders (and existing folders). On start-up it will look through existing folders already in the directory to check if any of them need analysis. Once the analysis of these files has been completed it will wait new folders to be detected. Once anew folder has been detected it will look for the appropriate files corresponding to the '.set' files it detects. One at a time these tetrode files will be analyzed via KlustaKwik through Tint. ***Note: if there is an existing ‘.cut’ file for a corresponding tetrode, the analysis of this tetrode will be skipped.*** A Command Prompt will print messages stating which file it is analyzing, if there is a new file, etc. ***Do not close this Command Prompt or the GUI will stop***.
 
 As long as each folder contains all the appropriate file types that Tint needs, the GUI will analyze the data appropriately. Prior to the newest update, you would have each session (One '.set' and it's corresponding files) per folder. Now the GUI will look for however many '.set' files there are within each folder and analyze their corresponding tetrode data.
 
-There is also capabilities of determining if you want Tint to run in "silent" mode or be "visible". There is a Run Silently checkbox on main window of the GUI that you will be able to check. If it is checked everything will run in the background.
+There are also capabilities of determining if you want Tint to run in "silent" mode or be "visible". There is a Run Silently checkbox on main window of the GUI that you will be able to check. If it is checked everything will run in the background.
 
-There is also a Multi-Thread checkbox. Once this is checked you will be able to determine how many threads you want to utilize. Essentially multi-threading is pseudo parallel-processing technique. The "# Threads" field can be filled in once the checkbox is checked. This value will correspond to the number of tetrodes you want to process at the same time. You will want to make this decision based off of the processing power and RAM that your computer has. ***Note: the multi-threading functionality has not been implemented yet, but the field is there as a place-holder.***
-
+There is also a Multiprocessing checkbox. Once this is checked you will be able to edit how many cores your computer has. This core number value is used as multiprocessing generally does not provide any added benefit if the amount of processes is greater than the amount of cores your system has. This functionality has not been implemented as of this version.
+There is also a simultaneous tetrodes field which you can utilize. This value will tell the GUI how many tetrodes you want to analyze at the same time using multi-threading. 
 # To Do
 
-- Add multi-threading so it can analyze multiple tetrode files at the same time
+- Add multiprocessing so the GUI can analyze multiple files at the same time
 - Add a notification system so it can e-mail/text if the analysis has been completed or if an error has occurred
 - Add a queue system so that users can define which order they want the files to be processed in
 
