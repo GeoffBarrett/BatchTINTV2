@@ -45,6 +45,8 @@ class runKlusta():
             set_msg = 'There is ' + str(len(set_files)) + " '.set' file in this directory"
         print('[' + str(cur_time)[:8] + ']: ' + set_msg)
 
+        skipped = 0
+
         for i in range(len(set_files)):
 
             set_file = set_files[i][:-3]
@@ -67,6 +69,9 @@ class runKlusta():
             elif str(set_file[:-1]) + '.eeg' not in f_list:
                 cur_time = datetime.datetime.now().time()
                 no_eeg_msg = ': There is no "' + str(set_file[:-1]) + '.eeg' '" file in this folder, skipping analysis!'
+
+                skipped = 1
+
                 print('[' + str(cur_time)[:8] + ']' + no_eeg_msg)
                 continue
             else:
@@ -95,9 +100,21 @@ class runKlusta():
                         t.join()
                 q.join()
 
-        cur_time = datetime.datetime.now().time()
-        fin_msg = ': Analysis in this directory has been completed!'
-        print('[' + str(cur_time)[:8] + ']' + fin_msg)
+        if skipped == 0:
+            cur_time = datetime.datetime.now().time()
+            fin_msg = ': Analysis in this directory has been completed!'
+            print('[' + str(cur_time)[:8] + ']' + fin_msg)
+
+            proc_f_dir = os.path.join(directory, 'Processed')
+            processing = 1
+            while processing == 1:
+                processing = 0
+                try:
+                    # moves the entire folder to the processed folder
+                    os.rename(dir_new, os.path.join(proc_f_dir, expt))
+                except PermissionError:
+                    processing = 1
+
 
     def analyze_tet(self, q, set_path, set_file, f_list, dir_new, log_f_dir, ini_f_dir):
         '''

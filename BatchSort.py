@@ -260,17 +260,6 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
 
                     RunKlustaV2.runKlusta.klusta(self, expt, directory)  # runs the function that will perform the klusta'ing
 
-                    dir_new = os.path.join(directory, expt)
-                    proc_f_dir = os.path.join(directory, 'Processed')
-                    processing = 1
-                    while processing == 1:
-                        processing = 0
-                        try:
-                            # moves the entire folder to the processed folder
-                            os.rename(dir_new, os.path.join(proc_f_dir, expt))
-                        except PermissionError:
-                            processing = 1
-
                 except NotADirectoryError:
                     cur_time = datetime.datetime.now().time()
                     print('[' + str(cur_time)[:8] + ']: ' + expt + ' is not a directory, skipping analysis!')  # if the file is not a directory it prints this message
@@ -336,15 +325,6 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                                 RunKlustaV2.runKlusta.klusta(self, new_file,
                                                              directory)  # runs the function that will perform the klusta'ing
 
-                                proc_f_dir = os.path.join(directory, 'Processed')
-                                processing = 1
-                                while processing == 1:
-                                    processing = 0
-                                    try:
-                                        # moves the entire folder to the processed folder
-                                        os.rename(dir_new, os.path.join(proc_f_dir, new_file))
-                                    except PermissionError:
-                                        processing = 1
 
                             except NotADirectoryError:
                                 print(directory + ' is not a directory, skipping analysis!')
