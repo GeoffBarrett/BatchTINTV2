@@ -36,7 +36,7 @@ git clone https://github.com/GeoffBarrett/BatchTINTV2.git
 
 ***Note: This may take a few minutes. If there is an error produced by the Command Prompt saying the following:*** 
 
-***'git' is not recognized as an internal or external command,operable program or batch file.***
+***'git' is not recognized as an internal or external command, operable program or batch file.***
 
 ***ensure that you have added the appropriate git locations to the path system variable. Follow these steps in order to add system variables***
 
@@ -92,7 +92,7 @@ The wheel files are the following:
 
 ***Note: if you are using Python 3.5 you can find those .whl files here: http://www.lfd.uci.edu/~gohlke/pythonlibs/#pyqt4***
 
-6) Install the python library repsonsible for some of the images on the GUI
+6) Install the python library responsible for some of the images on the GUI
 
 Type in the following into the Command Prompt:
 
@@ -120,22 +120,22 @@ there is no directory chosen), as a few checkboxes, and a few buttons at the bot
 
 Once a directory has been chosen you can now look through the Klusta Settings (by clicking the Klusta Settings button) and look through the basic/advanced settings options. The format should look familiar as it is a replica (almost) of that which you've seen while using Tint.
 
-It is important to change the ***Number of Tetrodes*** option in the 'basic' tab. This will help the GUI look for the tetrode data. Our lab uses both 4 and 8 tetrode drives therefore the default for this GUI was set to 8. This number does not need to be exact, but it needs to be greater than or equal to the number of tetrodes you used in the files you are analyzing. If you have 8 tetrodes but the field has the number 4 filled in, it will only analyze the first four tetrdoes (if they exist in the folder). It will skip any non-existing tetrdoes.
+It is important to change the ***Number of Tetrodes*** option in the 'basic' tab. This will help the GUI look for the tetrode data. Our lab uses both 4 and 8 tetrode drives therefore the default for this GUI was set to 8. This number does not need to be exact, but it needs to be greater than or equal to the number of tetrodes you used in the files you are analyzing. If you have 8 tetrodes but the field has the number 4 filled in, it will only analyze the first four tetrodes (if they exist in the folder). It will skip any non-existing tetrodes.
 
 Once these settings have been applied, the values will be saved for the next time you open up the GUI.
 
-How this works is the GUI will look in the chosen directory for new folders (and exisiting folders). On start-up it will look through existing folders already in the directoy to check if any of them need analysis. Once the analysis of these files has been completed it will wait new folders to be detected. Once anew folder has been detected it will look for the appropriate files corresponding to the '.set' files it detects. One at a time these tetrode files will be analyzed via KlustaKwik through Tint. ***Note: if there is an existing .cut file for a corresponding tetrode, the analysis of this tetrode will be skipped.*** A Command Prompt will print messages stating which file it is analyzing, if there is a new file, etc. ***Do not close this Command Prompt or the GUI will stop***.
+How this works is the GUI will look in the chosen directory for new folders (and existing folders). On start-up it will look through existing folders already in the directory to check if any of them need analysis. Once the analysis of these files has been completed it will wait new folders to be detected. Once anew folder has been detected it will look for the appropriate files corresponding to the '.set' files it detects. One at a time these tetrode files will be analyzed via KlustaKwik through Tint. ***Note: if there is an existing .cut file for a corresponding tetrode, the analysis of this tetrode will be skipped.*** A Command Prompt will print messages stating which file it is analyzing, if there is a new file, etc. ***Do not close this Command Prompt or the GUI will stop***.
 
-As long as each folder contains all the appropriate file types that Tint needs, the GUI will analyze the data approporiately. Prior to the newest update, you would have each session (One '.set' and it's corresponding files) per folder. Now the GUI will look for however many '.set' files there are within each folder and analyze their corresponding tetrode data.
+As long as each folder contains all the appropriate file types that Tint needs, the GUI will analyze the data appropriately. Prior to the newest update, you would have each session (One '.set' and it's corresponding files) per folder. Now the GUI will look for however many '.set' files there are within each folder and analyze their corresponding tetrode data.
 
-There is also capabilities of determing if you want Tint to run in "silent" mode or be "visible". There is a Run Silently checkbox on main window of the GUI that you will be able to check. If it is checked everything will run in the background.
+There is also capabilities of determining if you want Tint to run in "silent" mode or be "visible". There is a Run Silently checkbox on main window of the GUI that you will be able to check. If it is checked everything will run in the background.
 
-There is also a Multi-Thread checkbox. Once this is checked you will be able to determine how many threads you want to utilize. Essentailly multi-threading is pseudo parallel-processing technique. The "# Threads" field can be filled in once the checkbox is checked. This value will correspond to the number of tetrodes you want to process at the same time. You will want to make this decision based off of the processing power and RAM that your computer has. ***Note: the multi-threading functionality has not been implemented yet, but the field is there as a place-holder.***
+There is also a Multi-Thread checkbox. Once this is checked you will be able to determine how many threads you want to utilize. Essentially multi-threading is pseudo parallel-processing technique. The "# Threads" field can be filled in once the checkbox is checked. This value will correspond to the number of tetrodes you want to process at the same time. You will want to make this decision based off of the processing power and RAM that your computer has. ***Note: the multi-threading functionality has not been implemented yet, but the field is there as a place-holder.***
 
 # To Do
 
 - Add multi-threading so it can analyze multiple tetrode files at the same time
-- Add a notification system so it can e-mail/text if the analysis has been completed or if an error has occured
+- Add a notification system so it can e-mail/text if the analysis has been completed or if an error has occurred
 - Add a queue system so that users can define which order they want the files to be processed in
 
 # Contact
