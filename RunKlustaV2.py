@@ -16,8 +16,8 @@ class runKlusta():
 
         dir_new = os.path.join(directory, expt)  # makes a new directory
 
-        log_f_dir = os.path.join(dir_new, 'log_files')
-        ini_f_dir = os.path.join(dir_new, 'ini_files')
+        log_f_dir = os.path.join(dir_new, 'LogFiles')
+        ini_f_dir = os.path.join(dir_new, 'IniFiles')
 
         proc_f_dir = os.path.join(directory, 'Processed')
 
@@ -129,7 +129,7 @@ class runKlusta():
         '''
         # item = q.get()
 
-        inactive_tet_dir = os.path.join(dir_new, 'Inactive_Tetrode_Files')
+        inactive_tet_dir = os.path.join(dir_new, 'InactiveTetrodeFiles')
 
         if q.empty():
             q.task_done()
