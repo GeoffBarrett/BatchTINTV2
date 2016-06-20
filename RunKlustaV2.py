@@ -150,8 +150,10 @@ class runKlusta():
                 cut_name = set_file[:-1] + '_' + str(tetrode) + '.cut'
 
                 if cut_name in f_list:
+                    cur_date = datetime.datetime.now().date()
+                    cur_time = datetime.datetime.now().time()
                     already_done = 'The ' + tet_fname + ' file has already been analyzed, skipping analysis!'
-                    print(already_done)
+                    print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']: ' + already_done)
                     q.task_done()
                     continue
 
@@ -297,6 +299,7 @@ class runKlusta():
                             processing = 1
 
                     elif log_fname in new_cont:
+                        active_tet = []
                         with open(log_fpath, 'r') as f:
                             for line in f:
                                 if 'list of active tetrodes:' in line:
@@ -312,8 +315,10 @@ class runKlusta():
                                                      str(set_file[:-1]) + ' set file!'
                                         print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + not_active)
                                         break
+                                else:
+                                    activ_tet = []
 
-                        if 'activ_tet' in locals() and str(tetrode) not in str(activ_tet):
+                        if activ_tet != [] and str(tetrode) not in str(activ_tet):
                             x = 1
                             while x == 1:
                                 try:
@@ -343,7 +348,6 @@ class runKlusta():
                                 except PermissionError:
                                     x = 1
                                 processing = 0
-
 
                 try:
                     q.task_done()
