@@ -230,7 +230,8 @@ class runKlusta():
                         writing = 1
                 '''
 
-                log_fname = tet_path + '_log.txt'
+                log_fpath = tet_path + '_log.txt'
+                log_fname = tet_fname + '_log.txt'
 
                 cmdline = ["cmd", "/q", "/k", "echo off"]
 
@@ -241,13 +242,13 @@ class runKlusta():
                 if self.settings['Silent'] == 0:
                     batch = bytes(
                         'tint ' + '"' + set_path + '" ' + str(
-                            tetrode) + ' "' + log_fname + '" /runKK /KKoptions "' +
+                            tetrode) + ' "' + log_fpath + '" /runKK /KKoptions "' +
                         ini_fpath + '" /convertkk2cut /visible\n'
                         'exit\n', 'ascii')
                 else:
                     batch = bytes(
                         'tint ' + '"' + set_path + '" ' + str(
-                            tetrode) + ' "' + log_fname + '" /runKK /KKoptions "' +
+                            tetrode) + ' "' + log_fpath + '" /runKK /KKoptions "' +
                         ini_fpath + '" /convertkk2cut\n'
                                     'exit\n', 'ascii')
 
@@ -269,13 +270,13 @@ class runKlusta():
                             try:
                                 # moves the log files
                                 try:
-                                    os.rename(log_fname, os.path.join(log_f_dir, tet_fname + '_log.txt'))
+                                    os.rename(log_fpath, os.path.join(log_f_dir, tet_fname + '_log.txt'))
                                 except FileNotFoundError:
                                     pass
 
                             except FileExistsError:
                                 os.remove(os.path.join(log_f_dir, tet_fname + '_log.txt'))
-                                os.rename(log_fname, os.path.join(log_f_dir, tet_fname + '_log.txt'))
+                                os.rename(log_fpath, os.path.join(log_f_dir, tet_fname + '_log.txt'))
                             try:
                                 # moves the .ini files
                                 os.rename(ini_fpath, os.path.join(ini_f_dir, tet_fname + '.ini'))
