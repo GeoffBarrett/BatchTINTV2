@@ -242,12 +242,14 @@ class runKlusta():
                     batch = bytes(
                         'tint ' + '"' + set_path + '" ' + str(
                             tetrode) + ' "' + log_fname + '" /runKK /KKoptions "' +
-                        ini_fpath + '" /convertkk2cut /visible\n', 'ascii')
+                        ini_fpath + '" /convertkk2cut /visible\n'
+                        'exit\n', 'ascii')
                 else:
                     batch = bytes(
                         'tint ' + '"' + set_path + '" ' + str(
                             tetrode) + ' "' + log_fname + '" /runKK /KKoptions "' +
-                        ini_fpath + '" /convertkk2cut\n', 'ascii')
+                        ini_fpath + '" /convertkk2cut\n'
+                                    'exit\n', 'ascii')
 
                 cmd.stdin.write(batch)
                 cmd.stdin.flush()

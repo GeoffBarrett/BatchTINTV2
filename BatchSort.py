@@ -227,7 +227,7 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
             self.hide()
             cur_date = datetime.datetime.now().date()
             cur_time = datetime.datetime.now().time()
-            dir_message = 'Analyzing the following direcotry: ' + directory  # display message
+            dir_message = 'Analyzing the following directory: ' + directory  # display message
             print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']: ' + dir_message)  # prints the display message
 
             # ------------- find all files within directory -------------------------------------
