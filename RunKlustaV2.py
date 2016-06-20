@@ -310,7 +310,6 @@ class runKlusta():
                                         not_active = ': Tetrode ' + str(tetrode) + ' is not active within the ' + \
                                                      str(set_file[:-1]) + ' set file!'
                                         print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + not_active)
-                                        processing = 0
 
                                         x = 1
                                         while x == 1:
@@ -340,7 +339,7 @@ class runKlusta():
 
                                             except PermissionError:
                                                 x = 1
-
+                                        processing = 0
                                         break
 
                                     else:
