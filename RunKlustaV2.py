@@ -88,9 +88,10 @@ class runKlusta():
                     ThreadCount = len(tet_list)
 
                 while not q.empty():
+                    skipped_mat = [] * 10
                     Threads = []
                     for i in range(ThreadCount):
-                        t = threading.Thread(target=runKlusta.analyze_tet, args=(self, q, set_path, set_file, f_list,
+                        t = threading.Thread(target=runKlusta.analyze_tet, args=(self, q, skipped_mat, i, set_path, set_file, f_list,
                                                                                  dir_new, log_f_dir, ini_f_dir))
                         time.sleep(0.5)
                         t.daemon = True
@@ -102,6 +103,9 @@ class runKlusta():
                     for t in Threads:
                         t.join()
                 q.join()
+        for k in range(len(skipped_mat)):
+            if skipped_mat[k] == 1:
+                skipped = 1
 
         if skipped == 0:
             cur_date = datetime.datetime.now().date()
@@ -118,9 +122,14 @@ class runKlusta():
                     os.rename(dir_new, os.path.join(proc_f_dir, expt))
                 except PermissionError:
                     processing = 1
+        else:
+            cur_date = datetime.datetime.now().date()
+            cur_time = datetime.datetime.now().time()
+            prob_fin_msg = ': There were some problems analyzing some files within this directory!'
+            print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + prob_fin_msg)
 
 
-    def analyze_tet(self, q, set_path, set_file, f_list, dir_new, log_f_dir, ini_f_dir):
+    def analyze_tet(self, q, skipped_mat, index, set_path, set_file, f_list, dir_new, log_f_dir, ini_f_dir):
         '''
         self.settings_fname = 'settings.json'
 
@@ -300,6 +309,7 @@ class runKlusta():
 
                     elif log_fname in new_cont:
                         active_tet = []
+                        no_spike = []
                         with open(log_fpath, 'r') as f:
                             for line in f:
                                 if 'list of active tetrodes:' in line:
@@ -315,10 +325,51 @@ class runKlusta():
                                                      str(set_file[:-1]) + ' set file!'
                                         print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + not_active)
                                         break
+                                elif 'reading 0 spikes' in line:
+                                    no_spike = 1
+                                    skipped_mat[index] = 1
+                                    cur_date = datetime.datetime.now().date()
+                                    cur_time = datetime.datetime.now().time()
+                                    not_spike = ': Tetrode ' + str(tetrode) + ' within the ' + \
+                                                 str(set_file[:-1]) + ' set file, has no spikes, skipping!'
+                                    print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + not_spike)
+                                    break
+
                                 else:
                                     activ_tet = []
 
                         if 'activ_tet' in locals() and activ_tet != [] and str(tetrode) not in str(activ_tet):
+                            x = 1
+                            while x == 1:
+                                try:
+                                    try:
+                                        # moves the log files
+                                        try:
+                                            os.rename(log_fpath,
+                                                      os.path.join(log_f_dir, tet_fname + '_log.txt'))
+                                        except FileNotFoundError:
+                                            pass
+
+                                    except FileExistsError:
+                                        os.remove(os.path.join(log_f_dir, tet_fname + '_log.txt'))
+                                        os.rename(log_fpath,
+                                                  os.path.join(log_f_dir, tet_fname + '_log.txt'))
+                                    try:
+                                        # moves the .ini files
+                                        os.rename(ini_fpath, os.path.join(ini_f_dir, tet_fname + '.ini'))
+                                    except FileExistsError:
+                                        os.remove(os.path.join(ini_f_dir, tet_fname + '.ini'))
+                                        os.rename(ini_fpath, os.path.join(ini_f_dir, tet_fname + '.ini'))
+
+                                    os.rename(tet_path, os.path.join(inactive_tet_dir, tet_fname))
+
+                                    x = 0
+
+                                except PermissionError:
+                                    x = 1
+                                processing = 0
+
+                        if 'no_spike' in locals() and no_spike == 1:
                             x = 1
                             while x == 1:
                                 try:
