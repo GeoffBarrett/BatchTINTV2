@@ -9,10 +9,10 @@ class runKlusta():
         super(runKlusta, self).__init__()
 
     def klusta(self, expt, directory):
-
+        cur_date = datetime.datetime.now().date()
         cur_time = datetime.datetime.now().time()
         folder_msg = ': Now analyzing files in the "' + expt + '" folder!'
-        print('[' + str(cur_time)[:8] + ']' + folder_msg)
+        print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + folder_msg)
 
         dir_new = os.path.join(directory, expt)  # makes a new directory
 
@@ -38,12 +38,13 @@ class runKlusta():
         f_list = os.listdir(dir_new)  # finds the files within that directory
 
         set_files = [file for file in f_list if '.set' in file]
+        cur_date = datetime.datetime.now().date()
         cur_time = datetime.datetime.now().time()
         if len(set_files) > 1:
             set_msg = 'There are ' + str(len(set_files)) + " '.set' files in this directory"
         else:
             set_msg = 'There is ' + str(len(set_files)) + " '.set' file in this directory"
-        print('[' + str(cur_time)[:8] + ']: ' + set_msg)
+        print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']: ' + set_msg)
 
         skipped = 0
 
@@ -51,28 +52,30 @@ class runKlusta():
 
             set_file = set_files[i][:-3]
             set_path = os.path.join(dir_new, set_file[:-1])
-
+            cur_date = datetime.datetime.now().date()
             cur_time = datetime.datetime.now().time()
             cur_set_msg = 'Now analyzing tetrodes associated with the  ' + str(set_file[:-1]) + \
                           " '.set' file."
-            print('[' + str(cur_time)[:8] + ']: ' + cur_set_msg)
+            print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']: ' + cur_set_msg)
 
             tet_list = [file for file in f_list if file in ['%s%d' % (set_file, i)
                                                             for i in range(1, int(self.settings['NumTet']) + 1)]]
 
             if tet_list == []:
+                cur_date = datetime.datetime.now().date()
                 cur_time = datetime.datetime.now().time()
                 no_files_msg = ': There are no files that need analyzing in the "' + expt + '" folder!'
-                print('[' + str(cur_time)[:8] + ']' + no_files_msg)
+                print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_files_msg)
             elif expt == 'Processed':
                 continue
             elif str(set_file[:-1]) + '.eeg' not in f_list:
+                cur_date = datetime.datetime.now().date()
                 cur_time = datetime.datetime.now().time()
                 no_eeg_msg = ': There is no "' + str(set_file[:-1]) + '.eeg' '" file in this folder, skipping analysis!'
 
                 skipped = 1
 
-                print('[' + str(cur_time)[:8] + ']' + no_eeg_msg)
+                print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_eeg_msg)
                 continue
             else:
                 q = queue.Queue()
@@ -101,9 +104,10 @@ class runKlusta():
                 q.join()
 
         if skipped == 0:
+            cur_date = datetime.datetime.now().date()
             cur_time = datetime.datetime.now().time()
             fin_msg = ': Analysis in this directory has been completed!'
-            print('[' + str(cur_time)[:8] + ']' + fin_msg)
+            print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + fin_msg)
 
             proc_f_dir = os.path.join(directory, 'Processed')
             processing = 1
@@ -133,10 +137,10 @@ class runKlusta():
                 for i in range(1, int(self.settings['NumTet']) + 1):
                     if ['%s%d' % ('.', i) in tet_fname][0]:
                         tetrode = i
-
+                cur_date = datetime.datetime.now().date()
                 cur_time = datetime.datetime.now().time()
                 file_analyze_msg = ': Now analyzing the following file: ' + tet_fname
-                print('[' + str(cur_time)[:8] + ']' + file_analyze_msg)
+                print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + file_analyze_msg)
 
                 clu_name = set_path + '.clu.' + str(tetrode)
                 cut_path = set_path + '_' + str(tetrode) + '.cut'
@@ -276,9 +280,10 @@ class runKlusta():
                             except FileExistsError:
                                 os.remove(os.path.join(ini_f_dir, tet_fname + '.ini'))
                                 os.rename(ini_fpath, os.path.join(ini_f_dir, tet_fname + '.ini'))
-
+                            cur_date = datetime.datetime.now().date()
+                            cur_time = datetime.datetime.now().time()
                             finished_analysis = ': The analysis of the "' + tet_fname + '" file is finished!'
-                            print('[' + str(cur_time)[:8] + ']' + finished_analysis)
+                            print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + finished_analysis)
                             pass
                         except PermissionError:
                             processing = 1

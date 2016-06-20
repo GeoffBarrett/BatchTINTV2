@@ -225,21 +225,24 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
 
         elif klusta_ready:
             self.hide()
+            cur_date = datetime.datetime.now().date()
             cur_time = datetime.datetime.now().time()
             dir_message = 'Analyzing the following direcotry: ' + directory  # display message
-            print('[' + str(cur_time)[:8] + ']: ' + dir_message)  # prints the display message
+            print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']: ' + dir_message)  # prints the display message
 
             # ------------- find all files within directory -------------------------------------
 
             expt_list = os.listdir(directory)   # finds the files within the directory
             if len(expt_list) == 1 and expt_list[0] == 'Processed':
+                cur_date = datetime.datetime.now().date()
                 cur_time = datetime.datetime.now().time()
                 no_files_dir_msg = ': There are no files to analyze in this directory!'  # message that shows how many files were found
-                print('[' + str(cur_time)[:8] + ']' + no_files_dir_msg)  # prints message
+                print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_files_dir_msg)  # prints message
             else:
+                cur_date = datetime.datetime.now().date()
                 cur_time = datetime.datetime.now().time()
                 num_files_dir_msg = ': Found ' + str(len(expt_list)) + ' files in the directory!'  # message that shows how many files were found
-                print('[' + str(cur_time)[:8] + ']' + num_files_dir_msg)  # prints message
+                print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + num_files_dir_msg)  # prints message
 
             # ----------- cycle through each file and find the tetrode files ------------------------------------------
 
@@ -253,16 +256,18 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                     if expt == 'Processed':
                         continue
                     elif set_file == []: # if there is no set file it will return as an empty list
+                        cur_date = datetime.datetime.now().date()
                         cur_time = datetime.datetime.now().time()
                         set_message = ': The following folder contains no .set file: ' + str(expt)  # message saying no .set file
-                        print('[' + str(cur_time)[:8] + ']' + set_message)  # prints the message on the CMD
+                        print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + set_message)  # prints the message on the CMD
                         continue
 
                     RunKlustaV2.runKlusta.klusta(self, expt, directory)  # runs the function that will perform the klusta'ing
 
                 except NotADirectoryError:
+                    cur_date = datetime.datetime.now().date()
                     cur_time = datetime.datetime.now().time()
-                    print('[' + str(cur_time)[:8] + ']: ' + expt + ' is not a directory, skipping analysis!')  # if the file is not a directory it prints this message
+                    print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']: ' + expt + ' is not a directory, skipping analysis!')  # if the file is not a directory it prints this message
                     continue
 
             # --------------------------- makes a while loop that will check for new files to analyze -----------------
@@ -299,18 +304,21 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                                     for f in filenames:
                                         fp = os.path.join(dirpath, f)
                                         total_size += os.path.getsize(fp)
+                                cur_date = datetime.datetime.now().date()
                                 cur_time = datetime.datetime.now().time()
                                 download_msg = new_file + ' is downloading... (' + str(total_size) +\
                                                ' bytes downloaded)!'
-                                print('[' + str(cur_time)[:8] + ']: ' + download_msg)
+                                print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']: ' + download_msg)
                                 # if total_size > total_size_old and len(start_path) > count_old:
                                 if total_size > total_size_old:
                                     total_size_old = total_size
                                     time.sleep(45)  # waits x amount of seconds
                                 elif total_size == total_size_old:
-                                    cur_time = datetime.datetime.now().time()
+                                    cur_date = datetime.datetime.now().date()
+                                    cur_time = str(datetime.datetime.now().date()) + ' ' + str(
+                                        datetime.datetime.now().time())
                                     download_complete_msg = new_file + ' has finished downloading!'
-                                    print('[' + str(cur_time)[:8] + ']: ' + download_complete_msg)
+                                    print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']: ' + download_complete_msg)
                                     file_complete = 1
                             try:
                                 dir_new = os.path.join(directory, new_file)
