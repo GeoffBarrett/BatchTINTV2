@@ -311,35 +311,40 @@ class runKlusta():
                                                      str(set_file[:-1]) + ' set file!'
                                         print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + not_active)
                                         processing = 0
+
+                                        processing = 1
+                                        while processing == 1:
+                                            try:
+                                                try:
+                                                    # moves the log files
+                                                    try:
+                                                        os.rename(log_fpath,
+                                                                  os.path.join(log_f_dir, tet_fname + '_log.txt'))
+                                                    except FileNotFoundError:
+                                                        pass
+
+                                                except FileExistsError:
+                                                    os.remove(os.path.join(log_f_dir, tet_fname + '_log.txt'))
+                                                    os.rename(log_fpath,
+                                                              os.path.join(log_f_dir, tet_fname + '_log.txt'))
+                                                try:
+                                                    # moves the .ini files
+                                                    os.rename(ini_fpath, os.path.join(ini_f_dir, tet_fname + '.ini'))
+                                                except FileExistsError:
+                                                    os.remove(os.path.join(ini_f_dir, tet_fname + '.ini'))
+                                                    os.rename(ini_fpath, os.path.join(ini_f_dir, tet_fname + '.ini'))
+
+                                                os.rename(tet_path, os.path.join(inactive_tet_dir, tet_fname))
+
+                                                processing = 0
+
+                                            except PermissionError:
+                                                processing = 1
+
                                         break
-                processing = 1
-                while processing == 1:
-                    try:
-                        try:
-                            # moves the log files
-                            try:
-                                os.rename(log_fpath, os.path.join(log_f_dir, tet_fname + '_log.txt'))
-                            except FileNotFoundError:
-                                pass
 
-                        except FileExistsError:
-                            os.remove(os.path.join(log_f_dir, tet_fname + '_log.txt'))
-                            os.rename(log_fpath, os.path.join(log_f_dir, tet_fname + '_log.txt'))
-                        try:
-                            # moves the .ini files
-                            os.rename(ini_fpath, os.path.join(ini_f_dir, tet_fname + '.ini'))
-                        except FileExistsError:
-                            os.remove(os.path.join(ini_f_dir, tet_fname + '.ini'))
-                            os.rename(ini_fpath, os.path.join(ini_f_dir, tet_fname + '.ini'))
-
-                        os.rename(tet_path, os.path.join(inactive_tet_dir, tet_fname))
-
-                        processing = 0
-
-                    except PermissionError:
-                        processing = 1
-
-
+                                    else:
+                                        pass
 
                 try:
                     q.task_done()
