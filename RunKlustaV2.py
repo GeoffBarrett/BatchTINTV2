@@ -318,7 +318,7 @@ class runKlusta():
                                 else:
                                     activ_tet = []
 
-                        if activ_tet != [] and str(tetrode) not in str(activ_tet):
+                        if 'activ_tet' in locals() and activ_tet != [] and str(tetrode) not in str(activ_tet):
                             x = 1
                             while x == 1:
                                 try:
