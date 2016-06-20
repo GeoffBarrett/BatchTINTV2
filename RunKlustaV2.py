@@ -291,7 +291,7 @@ class runKlusta():
                         except PermissionError:
                             processing = 1
                     elif log_fname in new_cont:
-                        with open(log_fname, 'r') as f:
+                        with open(log_fpath, 'r') as f:
                             for line in f:
                                 line_content = f.readline()
                                 if 'list of active tetrodes:' in line_content:
