@@ -289,6 +289,22 @@ class runKlusta():
                             pass
                         except PermissionError:
                             processing = 1
+                    elif log_fname in new_cont:
+                        with open(log_fname, 'r') as f:
+                            for line in f:
+                                line_content = f.readline()
+                                if 'list of active tetrodes:' in line_content:
+                                    tetrode_str = line_content[20:]
+                                    if tetrode not in tetrode_str:
+                                        cur_date = datetime.datetime.now().date()
+                                        cur_time = datetime.datetime.now().time()
+                                        not_active = ': Tetrode  ' + str(tetrode) + ' is not active within the ' +\
+                                                                                    str(set_file[:-1]) + ' set file!'
+                                        print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + not_active)
+
+                                        processing = 0
+                                    break
+
                 try:
                     q.task_done()
                 except ValueError:
