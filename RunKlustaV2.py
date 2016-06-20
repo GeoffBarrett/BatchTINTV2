@@ -296,7 +296,7 @@ class runKlusta():
                         with open(log_fpath, 'r') as f:
                             for line in f:
                                 if 'list of active tetrodes:' in line:
-                                    if tetrode not in str(line):
+                                    if str(tetrode) not in str(line):
                                         cur_date = datetime.datetime.now().date()
                                         cur_time = datetime.datetime.now().time()
                                         not_active = ': Tetrode  ' + str(tetrode) + ' is not active within the ' + \
