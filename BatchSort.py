@@ -124,8 +124,8 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
         try:
             with open(self.settings_fname, 'r+') as filename:
                 settings = json.load(filename)
-                self.core_num.setText(settings['Cores'])
-                self.Multithread.setText(settings['NumThreads'])
+                self.core_num.setText(str(settings['Cores']))
+                self.Multithread.setText(str(settings['NumThreads']))
                 if settings['Silent'] == 1:
                     self.silent_cb.toggle()
                 if settings['Multi'] == 1:
