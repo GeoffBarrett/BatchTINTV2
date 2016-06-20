@@ -128,6 +128,9 @@ class runKlusta():
             self.settings = json.load(filename)
         '''
         # item = q.get()
+
+        inactive_tet_dir = os.path.join(dir_new, 'Inactive_Tetrode_Files')
+
         if q.empty():
             q.task_done()
         else:
@@ -283,6 +286,7 @@ class runKlusta():
                             except FileExistsError:
                                 os.remove(os.path.join(ini_f_dir, tet_fname + '.ini'))
                                 os.rename(ini_fpath, os.path.join(ini_f_dir, tet_fname + '.ini'))
+
                             cur_date = datetime.datetime.now().date()
                             cur_time = datetime.datetime.now().time()
                             finished_analysis = ': The analysis of the "' + tet_fname + '" file is finished!'
@@ -297,12 +301,36 @@ class runKlusta():
                             for line in f:
                                 if 'list of active tetrodes:' in line:
                                     if str(tetrode) not in str(line):
+
+                                        if not os.path.exists(inactive_tet_dir):
+                                            os.makedirs(inactive_tet_dir)
+
                                         cur_date = datetime.datetime.now().date()
                                         cur_time = datetime.datetime.now().time()
-                                        not_active = ': Tetrode  ' + str(tetrode) + ' is not active within the ' + \
+                                        not_active = ': Tetrode ' + str(tetrode) + ' is not active within the ' + \
                                                      str(set_file[:-1]) + ' set file!'
                                         print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + not_active)
                                         processing = 0
+
+                                        try:
+                                            # moves the log files
+                                            try:
+                                                os.rename(log_fpath, os.path.join(log_f_dir, tet_fname + '_log.txt'))
+                                            except FileNotFoundError:
+                                                pass
+
+                                        except FileExistsError:
+                                            os.remove(os.path.join(log_f_dir, tet_fname + '_log.txt'))
+                                            os.rename(log_fpath, os.path.join(log_f_dir, tet_fname + '_log.txt'))
+                                        try:
+                                            # moves the .ini files
+                                            os.rename(ini_fpath, os.path.join(ini_f_dir, tet_fname + '.ini'))
+                                        except FileExistsError:
+                                            os.remove(os.path.join(ini_f_dir, tet_fname + '.ini'))
+                                            os.rename(ini_fpath, os.path.join(ini_f_dir, tet_fname + '.ini'))
+
+                                        os.rename(tet_path, os.path.join(inactive_tet_dir, tet_fname))
+
                                     break
 
                 try:
