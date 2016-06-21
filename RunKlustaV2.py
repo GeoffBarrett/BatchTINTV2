@@ -88,7 +88,7 @@ class runKlusta():
                     ThreadCount = len(tet_list)
 
                 while not q.empty():
-                    skipped_mat = [] * 10
+                    skipped_mat = [] * ThreadCount
                     Threads = []
                     for i in range(ThreadCount):
                         t = threading.Thread(target=runKlusta.analyze_tet, args=(self, q, skipped_mat, i, set_path, set_file, f_list,
@@ -100,12 +100,13 @@ class runKlusta():
 
                     # q.join()
 
+                    for k in range(len(skipped_mat)):
+                        if skipped_mat[k] == 1:
+                            skipped = 1
+
                     for t in Threads:
                         t.join()
                 q.join()
-        for k in range(len(skipped_mat)):
-            if skipped_mat[k] == 1:
-                skipped = 1
 
         if skipped == 0:
             cur_date = datetime.datetime.now().date()
