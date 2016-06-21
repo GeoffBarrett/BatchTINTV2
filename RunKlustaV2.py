@@ -86,9 +86,9 @@ class runKlusta():
 
                 if ThreadCount > len(tet_list):
                     ThreadCount = len(tet_list)
+                skipped_mat = []
 
                 while not q.empty():
-                    skipped_mat = [] * ThreadCount
                     Threads = []
                     for i in range(ThreadCount):
                         t = threading.Thread(target=runKlusta.analyze_tet, args=(self, q, skipped_mat, i, set_path, set_file, f_list,
@@ -100,13 +100,14 @@ class runKlusta():
 
                     # q.join()
 
-                    for k in range(len(skipped_mat)):
-                        if skipped_mat[k] == 1:
-                            skipped = 1
-
                     for t in Threads:
                         t.join()
                 q.join()
+
+        if 'skipped_mat' in locals():
+            for k in range(len(skipped_mat)):
+                if skipped_mat[k] == 1:
+                    skipped = 1
 
         if skipped == 0:
             cur_date = datetime.datetime.now().date()
@@ -328,7 +329,7 @@ class runKlusta():
                                         break
                                 elif 'reading 0 spikes' in line:
                                     no_spike = 1
-                                    skipped_mat[index] = 1
+                                    skipped_mat.append(1)
                                     cur_date = datetime.datetime.now().date()
                                     cur_time = datetime.datetime.now().time()
                                     not_spike = ': Tetrode ' + str(tetrode) + ' within the ' + \
