@@ -69,11 +69,17 @@ class runKlusta():
             elif expt == 'Processed':
                 continue
             elif str(set_file[:-1]) + '.eeg' not in f_list:
+                no_eeg_dir = os.path.join(dir_new, 'NoEEGFiles')
+                if not os.path.exists(no_eeg_dir):
+                    os.makedirs(no_eeg_dir)
+
+                # ------------move associated files to NoEEGFile -------------
+
                 cur_date = datetime.datetime.now().date()
                 cur_time = datetime.datetime.now().time()
                 no_eeg_msg = ': There is no "' + str(set_file[:-1]) + '.eeg' '" file in this folder, skipping analysis!'
 
-                skipped = 1
+                # skipped = 1
 
                 print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_eeg_msg)
                 continue
@@ -103,11 +109,12 @@ class runKlusta():
                     for t in Threads:
                         t.join()
                 q.join()
-
+        '''
         if 'skipped_mat' in locals():
             for k in range(len(skipped_mat)):
                 if skipped_mat[k] == 1:
                     skipped = 1
+
 
         if skipped == 0:
             cur_date = datetime.datetime.now().date()
@@ -125,10 +132,11 @@ class runKlusta():
                 except PermissionError:
                     processing = 1
         else:
-            cur_date = datetime.datetime.now().date()
-            cur_time = datetime.datetime.now().time()
-            prob_fin_msg = ': There were some problems analyzing some files within this directory!'
-            print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + prob_fin_msg)
+        '''
+        cur_date = datetime.datetime.now().date()
+        cur_time = datetime.datetime.now().time()
+        prob_fin_msg = ': There were some problems analyzing some files within this directory!'
+        print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + prob_fin_msg)
 
 
     def analyze_tet(self, q, skipped_mat, index, set_path, set_file, f_list, dir_new, log_f_dir, ini_f_dir):
@@ -141,6 +149,7 @@ class runKlusta():
         # item = q.get()
 
         inactive_tet_dir = os.path.join(dir_new, 'InactiveTetrodeFiles')
+        no_spike_dir = os.path.join(dir_new, 'NoSpikeFiles')
 
         if q.empty():
             q.task_done()
@@ -328,8 +337,12 @@ class runKlusta():
                                         print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + not_active)
                                         break
                                 elif 'reading 0 spikes' in line:
+
+                                    if not os.path.exists(no_spike_dir):
+                                        os.makedirs(no_spike_dir)
+
                                     no_spike = 1
-                                    skipped_mat.append(1)
+                                    # skipped_mat.append(1)
                                     cur_date = datetime.datetime.now().date()
                                     cur_time = datetime.datetime.now().time()
                                     not_spike = ': Tetrode ' + str(tetrode) + ' within the ' + \
@@ -394,7 +407,7 @@ class runKlusta():
                                         os.remove(os.path.join(ini_f_dir, tet_fname + '.ini'))
                                         os.rename(ini_fpath, os.path.join(ini_f_dir, tet_fname + '.ini'))
 
-                                    os.rename(tet_path, os.path.join(inactive_tet_dir, tet_fname))
+                                    os.rename(tet_path, os.path.join(no_spike_dir, tet_fname))
 
                                     x = 0
 
