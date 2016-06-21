@@ -234,10 +234,11 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
 
             expt_list = os.listdir(directory)   # finds the files within the directory
             if len(expt_list) == 1 and expt_list[0] == 'Processed':
-                cur_date = datetime.datetime.now().date()
-                cur_time = datetime.datetime.now().time()
-                no_files_dir_msg = ': There are no files to analyze in this directory!'  # message that shows how many files were found
-                print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_files_dir_msg)  # prints message
+                # cur_date = datetime.datetime.now().date()
+                # cur_time = datetime.datetime.now().time()
+                # no_files_dir_msg = ': There are no files to analyze in this directory!'  # message that shows how many files were found
+                # print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_files_dir_msg)  # prints message
+                pass
             else:
                 cur_date = datetime.datetime.now().date()
                 cur_time = datetime.datetime.now().time()

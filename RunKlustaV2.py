@@ -64,8 +64,18 @@ class runKlusta():
             if tet_list == []:
                 cur_date = datetime.datetime.now().date()
                 cur_time = datetime.datetime.now().time()
-                no_files_msg = ': There are no files that need analyzing in the "' + expt + '" folder!'
+                no_files_msg = ': The ' + str(set_file[:-1]) + " '.set' file has no tetrodes to analyze!"
+
+                associated_files = [file for file in f_list if str(set_file[:-1]) in file]
+                missing_dir = os.path.join(dir_new, 'MissingAssociatedFiles')
+                if not os.path.exists(missing_dir):
+                    os.makedirs(missing_dir)
+
+                for file in associated_files:
+                    os.rename(os.path.join(dir_new, file), os.path.join(missing_dir, file))
+
                 print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_files_msg)
+
             elif expt == 'Processed':
                 continue
 
