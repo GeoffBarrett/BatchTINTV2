@@ -68,21 +68,58 @@ class runKlusta():
                 print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_files_msg)
             elif expt == 'Processed':
                 continue
-            elif str(set_file[:-1]) + '.eeg' not in f_list:
-                no_eeg_dir = os.path.join(dir_new, 'NoEEGFiles')
-                if not os.path.exists(no_eeg_dir):
-                    os.makedirs(no_eeg_dir)
 
-                # ------------move associated files to NoEEGFile -------------
+            elif str(set_file[:-1]) + '.eeg' not in f_list:
+
+                associated_files = [file for file in f_list if str(set_file[:-1]) in file]
+                missing_dir = os.path.join(dir_new, 'MissingAssociatedFiles')
+                if not os.path.exists(missing_dir):
+                    os.makedirs(missing_dir)
+
+                for file in associated_files:
+                    os.rename(os.path.join(dir_new, file), os.path.join(missing_dir, file))
 
                 cur_date = datetime.datetime.now().date()
                 cur_time = datetime.datetime.now().time()
-                no_eeg_msg = ': There is no "' + str(set_file[:-1]) + '.eeg' '" file in this folder, skipping analysis!'
 
-                # skipped = 1
-
-                print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_eeg_msg)
+                if str(set_file[:-1]) + '.pos' not in associated_files:
+                    no_eeg_pos_msg = ': There is no "' + str(
+                        set_file[:-1]) + '.eeg' + '" or ' + str(
+                        set_file[:-1]) + '.pos' + '" file in this folder, skipping analysis!'
+                    # skipped = 1
+                    print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_eeg_pos_msg)
+                else:
+                    no_eeg_msg = ': There is no "' + str(set_file[:-1]) + '.eeg' '" file in this folder, skipping analysis!'
+                    # skipped = 1
+                    print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_eeg_msg)
                 continue
+
+            elif str(set_file[:-1]) + '.pos' not in f_list:
+
+                associated_files = [file for file in f_list if str(set_file[:-1]) in file]
+                missing_dir = os.path.join(dir_new, 'MissingAssociatedFiles')
+                if not os.path.exists(missing_dir):
+                    os.makedirs(missing_dir)
+
+                for file in associated_files:
+                    os.rename(os.path.join(dir_new, file), os.path.join(missing_dir, file))
+
+                cur_date = datetime.datetime.now().date()
+                cur_time = datetime.datetime.now().time()
+
+                if str(set_file[:-1]) + '.eeg' not in associated_files:
+                    no_eeg_pos_msg = ': There is no "' + str(
+                        set_file[:-1]) + '.pos' + '" or ' + str(
+                        set_file[:-1]) + '.eeg' + '" file in this folder, skipping analysis!'
+                    # skipped = 1
+                    print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_eeg_pos_msg)
+                else:
+                    no_pos_msg = ': There is no "' + str(
+                        set_file[:-1]) + '.pos' '" file in this folder, skipping analysis!'
+                    # skipped = 1
+                    print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_pos_msg)
+                continue
+
             else:
                 q = queue.Queue()
                 for u in tet_list:
@@ -117,27 +154,29 @@ class runKlusta():
 
 
         if skipped == 0:
-            cur_date = datetime.datetime.now().date()
-            cur_time = datetime.datetime.now().time()
-            fin_msg = ': Analysis in this directory has been completed!'
-            print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + fin_msg)
-
-            proc_f_dir = os.path.join(directory, 'Processed')
-            processing = 1
-            while processing == 1:
-                processing = 0
-                try:
-                    # moves the entire folder to the processed folder
-                    os.rename(dir_new, os.path.join(proc_f_dir, expt))
-                except PermissionError:
-                    processing = 1
-        else:
         '''
+        cur_date = datetime.datetime.now().date()
+        cur_time = datetime.datetime.now().time()
+        fin_msg = ': Analysis in this directory has been completed!'
+        print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + fin_msg)
+
+        proc_f_dir = os.path.join(directory, 'Processed')
+        processing = 1
+        while processing == 1:
+            processing = 0
+            try:
+                # moves the entire folder to the processed folder
+                os.rename(dir_new, os.path.join(proc_f_dir, expt))
+            except PermissionError:
+                processing = 1
+
+        '''
+        else:
         cur_date = datetime.datetime.now().date()
         cur_time = datetime.datetime.now().time()
         prob_fin_msg = ': There were some problems analyzing some files within this directory!'
         print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + prob_fin_msg)
-
+        '''
 
     def analyze_tet(self, q, skipped_mat, index, set_path, set_file, f_list, dir_new, log_f_dir, ini_f_dir):
         '''
