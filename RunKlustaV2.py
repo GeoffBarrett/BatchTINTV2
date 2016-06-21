@@ -162,7 +162,7 @@ class runKlusta():
                 if cut_name in f_list:
                     cur_date = datetime.datetime.now().date()
                     cur_time = datetime.datetime.now().time()
-                    already_done = 'The ' + tet_fname + ' file has already been analyzed, skipping analysis!'
+                    already_done = 'The ' + tet_fname + ' file has already been analyzed!'
                     print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']: ' + already_done)
                     q.task_done()
                     continue
@@ -332,7 +332,7 @@ class runKlusta():
                                     cur_date = datetime.datetime.now().date()
                                     cur_time = datetime.datetime.now().time()
                                     not_spike = ': Tetrode ' + str(tetrode) + ' within the ' + \
-                                                 str(set_file[:-1]) + ' set file, has no spikes, skipping!'
+                                                 str(set_file[:-1]) + ' set file, has no spikes, skipping analysis!'
                                     print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + not_spike)
                                     break
 

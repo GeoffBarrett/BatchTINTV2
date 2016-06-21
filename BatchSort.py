@@ -267,7 +267,7 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                 except NotADirectoryError:
                     cur_date = datetime.datetime.now().date()
                     cur_time = datetime.datetime.now().time()
-                    print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']: ' + expt + ' is not a directory, skipping analysis!')  # if the file is not a directory it prints this message
+                    print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']: ' + expt + ' is not a directory!')  # if the file is not a directory it prints this message
                     continue
 
             # --------------------------- makes a while loop that will check for new files to analyze -----------------
@@ -335,7 +335,7 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
 
 
                             except NotADirectoryError:
-                                print(directory + ' is not a directory, skipping analysis!')
+                                print(directory + ' is not a directory!')
                                 continue
                     '''
                     removed = set(contents).difference(newcontents)
