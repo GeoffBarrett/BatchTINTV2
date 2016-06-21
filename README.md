@@ -3,6 +3,8 @@ BatchTINTV2 is A GUI created by the Taub Institute in order to create an end-use
 
 This GUI will allow the user to define a directory. Within this directory it will be continuously (unless closed) searching for new files to analyze via Tint. The user simply drags a folder containing the appropriate '.set', '.eegx', '.pos', and '.x' tetrode files and the GUI will automatically detect these files and take care of the rest.
 
+***Note: This version is in testing, so expect bugs and report them if you'd like (refer to contact section)***
+
 # Requirements
 ***Operating System***: Windows
 
