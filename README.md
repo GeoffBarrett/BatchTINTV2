@@ -1,4 +1,6 @@
 # About BatchTINTV2
+New Update as of 6/23/2016 10:00 AM EST, re-clone to fix some of the bugs
+
 BatchTINTV2 is A GUI created by the Taub Institute in order to create an end-user friendly batch processing solution to complement Axona's new command line modification of TINT.
 
 This GUI will allow the user to define a directory. Within this directory it will be continuously (unless closed) searching for new files to analyze via Tint. The user simply drags a folder containing the appropriate '.set', '.eegx', '.pos', and '.x' tetrode files and the GUI will automatically detect these files and take care of the rest.
@@ -134,10 +136,16 @@ There are also capabilities of determining if you want Tint to run in "silent" m
 
 There is also a Multiprocessing checkbox. Once this is checked you will be able to edit how many cores your computer has. This core number value is used as multiprocessing generally does not provide any added benefit if the amount of processes is greater than the amount of cores your system has. This functionality has not been implemented as of this version.
 There is also a simultaneous tetrodes field which you can utilize. This value will tell the GUI how many tetrodes you want to analyze at the same time using multi-threading. 
+
+# Update Notes
+
+I have updated this version recently to add an e-mail notification system. The user can choose to be notified once a folder's analysis has been completed (default is that this notification system is off). Within this e-mail, there will be notes as to where the file exists now (The Processed folder) so that you can easily find it, as well as any errors (there was no '.eeg' or '.pos' file so it was not able to analyze the tetrodes, etc.). Now you will see an "SMTP Settings" button on the GUI, click this to setup the e-mail notifications. In order to utilize this e-mail setting, you have to add your e-mail's username and password as well as an SMTP server name and port number. These values will be for the e-mail that you want these notifications to be sent from. The default values are gmail's server name and port number as they have a free SMTP server and I personally use G-mail (and figure most others probably do as well). If you have g-mail you might need to go into the settings to allow access to "less secure apps" so that it will allow the system to send the e-mails. Otherwise it is most likely going to block the GUI from logging onto your e-mail through the SMTP server. This can be done by accessing the following link: https://www.google.com/settings/security/lesssecureapps
+
+Once you have input the data for the e-mail you want to receive the e-mails from, you can now "Add Experimenters" to the list. This will allow you to input the Experimenter Name and E-mail which will be listed on the SMTP Settings window. *** Note: You can add multiple e-mail addresses if you separate them by a comma.*** In most if not all of the TINT files there is an experimenter name value in the header section, make sure that value is appropriately filled out as this is how the GUI will know who to e-mail from the list of experimenters.
+
 # To Do
 
 - Add multiprocessing so the GUI can analyze multiple files at the same time
-- Add a notification system so it can e-mail/text if the analysis has been completed or if an error has occurred
 - Add a queue system so that users can define which order they want the files to be processed in
 
 # Contact
