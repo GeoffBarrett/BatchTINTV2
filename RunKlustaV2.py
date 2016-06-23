@@ -187,80 +187,79 @@ class runKlusta():
         fin_msg = ': Analysis in the "' + expt + '" directory has been completed!'
         print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + fin_msg)
 
-        if self.settings['Notification'] == 'On':
-            smtpfile = 'smtp.json'
+        smtpfile = 'smtp.json'
+        with open(smtpfile, 'r+') as filename:
+            smtp_data = json.load(filename)
 
-            with open(smtpfile, 'r+') as filename:
-                smtp_data = json.load(filename)
+            if smtp_data['Notification'] == 'On':
 
-            expter_fname = 'experimenter.json'
-            with open(expter_fname, 'r+') as f:
-                expters = json.load(f)
+                expter_fname = 'experimenter.json'
+                with open(expter_fname, 'r+') as f:
+                    expters = json.load(f)
 
-            toaddrs = []
-            for key, value in expters.items():
-                if str(key).lower() in str(experimenter).lower():
-                    if ',' in value and ', ' not in value:
-                        addresses = value.split(', ', 1)
-                        for address in addresses:
-                            toaddrs.append(address)
-                    if ', ' in value:
-                        addresses = value.split(', ', 1)
-                        for address in addresses:
-                            toaddrs.append(address)
+                toaddrs = []
+                for key, value in expters.items():
+                    if str(key).lower() in str(experimenter).lower():
+                        if ',' in value and ', ' not in value:
+                            addresses = value.split(', ', 1)
+                            for address in addresses:
+                                toaddrs.append(address)
+                        if ', ' in value:
+                            addresses = value.split(', ', 1)
+                            for address in addresses:
+                                toaddrs.append(address)
 
 
-            username = smtp_data['Username']
-            password = smtp_data['Password']
+                username = smtp_data['Username']
+                password = smtp_data['Password']
 
-            fromaddr = username
-            # toaddrs = ['gmbarrett313@gmail.com']
+                fromaddr = username
 
-            if error == []:
-                error = ['\tNo errors to report on the processing of this folder!\n\n']
+                if error == []:
+                    error = ['\tNo errors to report on the processing of this folder!\n\n']
 
-            subject = str(expt) + ' folder processed! [Automated Message]'
+                subject = str(expt) + ' folder processed! [Automated Message]'
 
-            text_list = ['Greetings from the Batch-TINTV2 automated messaging system!\n\n',
-                            'The "' + expt + '" directory has finished processing and is now located in the "' + proc_f_dir +\
-                            '" folder.\n\n',
-                         'The errors that occurred during processing are the following:\n\n']
+                text_list = ['Greetings from the Batch-TINTV2 automated messaging system!\n\n',
+                                'The "' + expt + '" directory has finished processing and is now located in the "' + proc_f_dir +\
+                                '" folder.\n\n',
+                             'The errors that occurred during processing are the following:\n\n']
 
-            for i in range(len(error)):
-                text_list.append(error[i])
+                for i in range(len(error)):
+                    text_list.append(error[i])
 
-            '''
-            for i in range(len(error)):
-                for k in range(1, int(self.settings['NumTet']) + 1):
-                    if '%s %d' % ('Tetrode', k) in error[i]:
-                        while
-                        text_list.append(error[i])
-            '''
-            text_list.append('\nHave a nice day,\n')
-            text_list.append('Batch-TINTV2\n\n')
-            text = ''.join(text_list)
+                '''
+                for i in range(len(error)):
+                    for k in range(1, int(self.settings['NumTet']) + 1):
+                        if '%s %d' % ('Tetrode', k) in error[i]:
+                            while
+                            text_list.append(error[i])
+                '''
+                text_list.append('\nHave a nice day,\n')
+                text_list.append('Batch-TINTV2\n\n')
+                text = ''.join(text_list)
 
-            # Prepare actual message
-            message = """\From: %s\nTo: %s\nSubject: %s\n\n%s
-                """ % (fromaddr, ", ".join(toaddrs), subject, text)
+                # Prepare actual message
+                message = """\From: %s\nTo: %s\nSubject: %s\n\n%s
+                    """ % (fromaddr, ", ".join(toaddrs), subject, text)
 
-            try:
-                # server = smtplib.SMTP('smtp.gmail.com:587')
-                server = smtplib.SMTP(str(smtp_data['ServerName']) + ':' + str(smtp_data['Port']))
-                server.ehlo()
-                server.starttls()
-                server.login(username, password)
-                server.sendmail(fromaddr, toaddrs, message)
-                server.close()
-                cur_date = datetime.datetime.now().date()
-                cur_time = datetime.datetime.now().time()
-                email_sent_msg = ': successfully sent e-mail!'
-                print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + email_sent_msg)
-            except:
-                cur_date = datetime.datetime.now().date()
-                cur_time = datetime.datetime.now().time()
-                email_failed_msg = ': failed to send e-mail, could be due to security settings of your e-mail!'
-                print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + email_failed_msg)
+                try:
+                    # server = smtplib.SMTP('smtp.gmail.com:587')
+                    server = smtplib.SMTP(str(smtp_data['ServerName']) + ':' + str(smtp_data['Port']))
+                    server.ehlo()
+                    server.starttls()
+                    server.login(username, password)
+                    server.sendmail(fromaddr, toaddrs, message)
+                    server.close()
+                    cur_date = datetime.datetime.now().date()
+                    cur_time = datetime.datetime.now().time()
+                    email_sent_msg = ': successfully sent e-mail!'
+                    print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + email_sent_msg)
+                except:
+                    cur_date = datetime.datetime.now().date()
+                    cur_time = datetime.datetime.now().time()
+                    email_failed_msg = ': failed to send e-mail, could be due to security settings of your e-mail!'
+                    print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + email_failed_msg)
 
         proc_f_dir = os.path.join(directory, 'Processed')
         processing = 1

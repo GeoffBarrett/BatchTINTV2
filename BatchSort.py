@@ -1017,8 +1017,11 @@ class SmtpSettings(QtGui.QWidget):
         expters = {}
         expter_fname = 'experimenter.json'
 
-        with open(expter_fname, 'r+') as f:
-            expters = json.load(f)
+        try:
+            with open(expter_fname, 'r+') as f:
+                expters = json.load(f)
+        except FileNotFoundError:
+            pass
 
         for key, value in expters.items():
             new_item = QtGui.QTreeWidgetItem()
