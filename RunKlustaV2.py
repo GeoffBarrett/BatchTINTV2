@@ -1,7 +1,7 @@
 # import os, read_data, json, subprocess
-import os, json, subprocess, time, datetime, queue
-from multiprocessing.dummy import Pool as ThreadPool
-import threading
+import os, json, subprocess, time, datetime, queue, threading, smtplib
+# from multiprocessing.dummy import Pool as ThreadPool
+from email.mime.text import MIMEText
 
 class runKlusta():
 
@@ -47,15 +47,15 @@ class runKlusta():
         print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']: ' + set_msg)
 
         skipped = 0
-
+        experimenter = []
+        error = []
         for i in range(len(set_files)):
-
             set_file = set_files[i][:-3]
             set_path = os.path.join(dir_new, set_file[:-1])
             cur_date = datetime.datetime.now().date()
             cur_time = datetime.datetime.now().time()
             cur_set_msg = 'Now analyzing tetrodes associated with the  ' + str(set_file[:-1]) + \
-                          " '.set' file."
+                          " '.set' file " + "(" + str(i+1) + "/" + str(len(set_files)) + ")."
             print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']: ' + cur_set_msg)
 
             tet_list = [file for file in f_list if file in ['%s%d' % (set_file, i)
@@ -65,7 +65,7 @@ class runKlusta():
                 cur_date = datetime.datetime.now().date()
                 cur_time = datetime.datetime.now().time()
                 no_files_msg = ': The ' + str(set_file[:-1]) + " '.set' file has no tetrodes to analyze!"
-
+                error.append('\tThe ' + str(set_file[:-1]) + " '.set' file had no tetrodes to analyze, couldn't perform analysis.\n")
                 associated_files = [file for file in f_list if str(set_file[:-1]) in file]
                 missing_dir = os.path.join(dir_new, 'MissingAssociatedFiles')
                 if not os.path.exists(missing_dir):
@@ -97,10 +97,15 @@ class runKlusta():
                         set_file[:-1]) + '.eeg' + '" or ' + str(
                         set_file[:-1]) + '.pos' + '" file in this folder, skipping analysis!'
                     # skipped = 1
+
+                    error.append('\tThe "' + str(set_file[:-1]) + '" \'.set\' file was not analyzed due to not having an \'.eeg\' and a \'.pos\' file.\n')
+
                     print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_eeg_pos_msg)
                 else:
                     no_eeg_msg = ': There is no "' + str(set_file[:-1]) + '.eeg' '" file in this folder, skipping analysis!'
                     # skipped = 1
+                    error.append('\tThe "' + str(set_file[
+                                               :-1]) + '" \'.set\' file was not analyzed due to not having an \'.eeg\' file.\n')
                     print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_eeg_msg)
                 continue
 
@@ -122,11 +127,15 @@ class runKlusta():
                         set_file[:-1]) + '.pos' + '" or ' + str(
                         set_file[:-1]) + '.eeg' + '" file in this folder, skipping analysis!'
                     # skipped = 1
+                    error.append('\tThe "' + str(set_file[
+                                               :-1]) + '" \'.set\' file was not analyzed due to not having an \'.eeg\' and a \'.pos\' file.\n')
                     print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_eeg_pos_msg)
                 else:
                     no_pos_msg = ': There is no "' + str(
                         set_file[:-1]) + '.pos' '" file in this folder, skipping analysis!'
                     # skipped = 1
+                    error.append('\tThe "' + str(set_file[
+                                               :-1]) + '" \'.set\' file was not analyzed due to not having a \'.pos\' file.\n')
                     print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_pos_msg)
                 continue
 
@@ -141,10 +150,18 @@ class runKlusta():
                     ThreadCount = len(tet_list)
                 skipped_mat = []
 
+                with open(set_path + '.set', 'r+') as f:
+                    for line in f:
+                        if 'experimenter ' in line:
+                            expter_line = line.split(' ', 1)
+                            expter_line.remove('experimenter')
+                            experimenter.append(' '.join(expter_line))
+                            break
+
                 while not q.empty():
                     Threads = []
                     for i in range(ThreadCount):
-                        t = threading.Thread(target=runKlusta.analyze_tet, args=(self, q, skipped_mat, i, set_path, set_file, f_list,
+                        t = threading.Thread(target=runKlusta.analyze_tet, args=(self, q, error, skipped_mat, i, set_path, set_file, f_list,
                                                                                  dir_new, log_f_dir, ini_f_dir))
                         time.sleep(0.5)
                         t.daemon = True
@@ -167,8 +184,83 @@ class runKlusta():
         '''
         cur_date = datetime.datetime.now().date()
         cur_time = datetime.datetime.now().time()
-        fin_msg = ': Analysis in this directory has been completed!'
+        fin_msg = ': Analysis in the "' + expt + '" directory has been completed!'
         print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + fin_msg)
+
+        if self.settings['Notification'] == 'On':
+            smtpfile = 'smtp.json'
+
+            with open(smtpfile, 'r+') as filename:
+                smtp_data = json.load(filename)
+
+            expter_fname = 'experimenter.json'
+            with open(expter_fname, 'r+') as f:
+                expters = json.load(f)
+
+            toaddrs = []
+            for key, value in expters.items():
+                if str(key).lower() in str(experimenter).lower():
+                    if ',' in value and ', ' not in value:
+                        addresses = value.split(', ', 1)
+                        for address in addresses:
+                            toaddrs.append(address)
+                    if ', ' in value:
+                        addresses = value.split(', ', 1)
+                        for address in addresses:
+                            toaddrs.append(address)
+
+
+            username = smtp_data['Username']
+            password = smtp_data['Password']
+
+            fromaddr = username
+            # toaddrs = ['gmbarrett313@gmail.com']
+
+            if error == []:
+                error = ['\tNo errors to report on the processing of this folder!\n\n']
+
+            subject = str(expt) + ' folder processed! [Automated Message]'
+
+            text_list = ['Greetings from the Batch-TINTV2 automated messaging system!\n\n',
+                            'The "' + expt + '" directory has finished processing and is now located in the "' + proc_f_dir +\
+                            '" folder.\n\n',
+                         'The errors that occurred during processing are the following:\n\n']
+
+            for i in range(len(error)):
+                text_list.append(error[i])
+
+            '''
+            for i in range(len(error)):
+                for k in range(1, int(self.settings['NumTet']) + 1):
+                    if '%s %d' % ('Tetrode', k) in error[i]:
+                        while
+                        text_list.append(error[i])
+            '''
+            text_list.append('\nHave a nice day,\n')
+            text_list.append('Batch-TINTV2\n\n')
+            text = ''.join(text_list)
+
+            # Prepare actual message
+            message = """\From: %s\nTo: %s\nSubject: %s\n\n%s
+                """ % (fromaddr, ", ".join(toaddrs), subject, text)
+
+            try:
+                # server = smtplib.SMTP('smtp.gmail.com:587')
+                server = smtplib.SMTP(str(smtp_data['ServerName']) + ':' + str(smtp_data['Port']))
+                server.ehlo()
+                server.starttls()
+                server.login(username, password)
+                server.sendmail(fromaddr, toaddrs, message)
+                server.close()
+                cur_date = datetime.datetime.now().date()
+                cur_time = datetime.datetime.now().time()
+                email_sent_msg = ': successfully sent e-mail!'
+                print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + email_sent_msg)
+            except:
+                cur_date = datetime.datetime.now().date()
+                cur_time = datetime.datetime.now().time()
+                email_failed_msg = ': failed to send e-mail, could be due to security settings of your e-mail!'
+                print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + email_failed_msg)
 
         proc_f_dir = os.path.join(directory, 'Processed')
         processing = 1
@@ -188,7 +280,7 @@ class runKlusta():
         print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + prob_fin_msg)
         '''
 
-    def analyze_tet(self, q, skipped_mat, index, set_path, set_file, f_list, dir_new, log_f_dir, ini_f_dir):
+    def analyze_tet(self, q, error, skipped_mat, index, set_path, set_file, f_list, dir_new, log_f_dir, ini_f_dir):
         '''
         self.settings_fname = 'settings.json'
 
@@ -201,7 +293,10 @@ class runKlusta():
         no_spike_dir = os.path.join(dir_new, 'NoSpikeFiles')
 
         if q.empty():
-            q.task_done()
+            try:
+                q.task_done()
+            except ValueError:
+                pass
         else:
             tet_list = [q.get()]
             for tet_fname in tet_list:
@@ -338,7 +433,7 @@ class runKlusta():
                     time.sleep(2)
                     new_cont = os.listdir(dir_new)
 
-                    if set_file[:-1] + '.clu.' + str(tetrode) in new_cont:
+                    if cut_name in new_cont:
                         processing = 0
                         try:
                             try:
@@ -383,6 +478,8 @@ class runKlusta():
                                         cur_time = datetime.datetime.now().time()
                                         not_active = ': Tetrode ' + str(tetrode) + ' is not active within the ' + \
                                                      str(set_file[:-1]) + ' set file!'
+                                        error.append('\tTetrode ' + str(tetrode) + ' was not active within the ' + \
+                                                     str(set_file[:-1]) + ' \'.set\' file, couldn\'t perform analysis.\n')
                                         print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + not_active)
                                         break
                                 elif 'reading 0 spikes' in line:
@@ -395,7 +492,11 @@ class runKlusta():
                                     cur_date = datetime.datetime.now().date()
                                     cur_time = datetime.datetime.now().time()
                                     not_spike = ': Tetrode ' + str(tetrode) + ' within the ' + \
-                                                 str(set_file[:-1]) + ' set file, has no spikes, skipping analysis!'
+                                                 str(set_file[:-1]) + ' \'.set\' file, has no spikes, skipping analysis!'
+
+                                    error.append('\tTetrode ' + str(tetrode) + ' within the ' + \
+                                                 str(set_file[:-1]) + ' \'.set\' file, had no spikes, couldn\'t perform analysis\n')
+
                                     print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + not_spike)
                                     break
 

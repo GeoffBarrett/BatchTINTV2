@@ -1,5 +1,4 @@
 import sys, json, time, os, subprocess, functools, datetime, RunKlustaV2
-# from RunKlustaV2.runKlusta import klusta, analyze_tet
 from PyQt4 import QtGui, QtCore
 from PIL import Image
 
@@ -74,6 +73,9 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
         klustabtn = QtGui.QPushButton('Batch-TINT', self)  # creates the batch-klusta pushbutton
         klustabtn.setToolTip('Click to perform batch analysis via Tint and KlustaKwik!')
 
+        self.smtpbtn = QtGui.QPushButton('SMTP Settings', self)
+        self.smtpbtn.setToolTip("Click to change the SMTP settings for e-mail notifications.")
+
         self.choose_dir = QtGui.QPushButton('Choose Directory', self)  # creates the choose directory pushbutton
 
         self.cur_dir = QtGui.QLineEdit()  # creates a line edit to display the chosen directory (current)
@@ -133,7 +135,6 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                 if settings['Multi'] == 0:
                     self.core_num.setDisabled(1)
 
-
         except FileNotFoundError:
             self.silent_cb.toggle()
             self.core_num.setDisabled(1)
@@ -155,7 +156,7 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
         # layout.addLayout(layout1)
         # layout.addWidget(quitbtn)
 
-        btn_order = [klustabtn, self.setbtn, quitbtn]  # defining button order (left to right)
+        btn_order = [klustabtn, self.setbtn, self.smtpbtn, quitbtn]  # defining button order (left to right)
         btn_layout = QtGui.QHBoxLayout()  # creating a widget to align the buttons
         # btn_layout.addStretch(1)
         for butn in btn_order:  # adds the buttons in the proper order
@@ -234,10 +235,10 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
 
             expt_list = os.listdir(directory)   # finds the files within the directory
             if len(expt_list) == 1 and expt_list[0] == 'Processed':
-                # cur_date = datetime.datetime.now().date()
-                # cur_time = datetime.datetime.now().time()
-                # no_files_dir_msg = ': There are no files to analyze in this directory!'  # message that shows how many files were found
-                # print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_files_dir_msg)  # prints message
+                cur_date = datetime.datetime.now().date()
+                cur_time = datetime.datetime.now().time()
+                no_files_dir_msg = ': There are no files to analyze in this directory!'  # message that shows how many files were found
+                print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_files_dir_msg)  # prints message
                 pass
             else:
                 cur_date = datetime.datetime.now().date()
@@ -251,7 +252,7 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
 
                 try:
 
-                    dir_new = os.path.join(directory, expt) # sets a new filepath for the directory
+                    dir_new = os.path.join(directory, expt)  # sets a new filepath for the directory
                     f_list = os.listdir(dir_new)  # finds the files within that directory
                     set_file = [file for file in f_list if '.set' in file] # finds the set file
                     if expt == 'Processed':
@@ -259,7 +260,7 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                     elif set_file == []: # if there is no set file it will return as an empty list
                         cur_date = datetime.datetime.now().date()
                         cur_time = datetime.datetime.now().time()
-                        set_message = ': The following folder contains no .set file: ' + str(expt)  # message saying no .set file
+                        set_message = ': The following folder contains no \'.set\' file: ' + str(expt)  # message saying no .set file
                         print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + set_message)  # prints the message on the CMD
                         continue
 
@@ -275,6 +276,11 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
             contents = os.listdir(directory)  # lists the contents of the directory (folders)
             count = len(directory)  # counts the amount of files in the directory
             dirmtime = os.stat(directory).st_mtime  # finds the modification time of the file
+
+            cur_date = datetime.datetime.now().date()
+            cur_time = datetime.datetime.now().time()
+            waiting_msg = ': Waiting for files to be added to this directory!'  # message that shows how many files were found
+            print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + waiting_msg)  # prints message
 
             # creation of a while loop that will constantly check for new folders added to the directory
             while True:
@@ -313,7 +319,7 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                                 # if total_size > total_size_old and len(start_path) > count_old:
                                 if total_size > total_size_old:
                                     total_size_old = total_size
-                                    time.sleep(45)  # waits x amount of seconds
+                                    time.sleep(60)  # waits x amount of seconds
                                 elif total_size == total_size_old:
                                     cur_date = datetime.datetime.now().date()
                                     cur_time = str(datetime.datetime.now().date()) + ' ' + str(
@@ -327,13 +333,14 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                                 set_file = [file for file in f_list if '.set' in file]
 
                                 if set_file == []:
+                                    cur_date = datetime.datetime.now().date()
+                                    cur_time = datetime.datetime.now().time()
                                     set_message = "The following folder contains no '.set' file: " + str(new_file)
-                                    print(set_message)
+                                    print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + set_message)
                                     continue
-
+                                # runs the function that will perform the klusta'ing
                                 RunKlustaV2.runKlusta.klusta(self, new_file,
-                                                             directory)  # runs the function that will perform the klusta'ing
-
+                                                             directory)
 
                             except NotADirectoryError:
                                 print(directory + ' is not a directory!')
@@ -973,6 +980,257 @@ class Choose_Dir(QtGui.QWidget):
             pass
         self.backbtn.animateClick()
 
+
+class SmtpSettings(QtGui.QWidget):
+    def __init__(self):
+        super(SmtpSettings, self).__init__()
+        background(self)
+        # deskW, deskH = background.Background(self)
+        width = self.deskW / 3
+        height = self.deskH / 3
+        self.setGeometry(0, 0, width, height)
+
+        self.smtpfile = 'smtp.json'  # defining the directory filename
+
+        try:
+            with open(self.smtpfile, 'r+') as filename:
+                self.smtp_data = json.load(filename)
+        except FileNotFoundError:
+            with open(self.smtpfile, 'w') as filename:
+                self.smtp_data = {}
+                self.smtp_data['ServerName'] = 'smtp.gmail.com'
+                self.smtp_data['Port'] = '587'
+                self.smtp_data['Username'] = ''
+                self.smtp_data['Password'] = ''
+                self.smtp_data['Notification'] = 'Off'
+                json.dump(self.smtp_data, filename)
+
+        self.setWindowTitle("BatchTINT - SMTP Settings")
+
+        # ----------------- smtp widgets ------------------------
+        self.expterList = QtGui.QTreeWidget()
+        self.expterList.headerItem().setText(0, "Experimenter")
+        self.expterList.headerItem().setText(1, "Emails")
+        self.expterList.setUniformRowHeights(True)
+
+        self.expterList.itemDoubleClicked.connect(self.editItems)
+        expters = {}
+        expter_fname = 'experimenter.json'
+
+        with open(expter_fname, 'r+') as f:
+            expters = json.load(f)
+
+        for key, value in expters.items():
+            new_item = QtGui.QTreeWidgetItem()
+            new_item.setFlags(new_item.flags() |QtCore.Qt.ItemIsEditable)
+            new_item.setText(0, key)
+            new_item.setText(1, value)
+            self.expterList.addTopLevelItem(new_item)
+
+        self.backbtn = QtGui.QPushButton('Back', self)
+        applybtn = QtGui.QPushButton('Apply', self)
+        applybtn.clicked.connect(self.ApplyBtn)
+
+        rembtn = QtGui.QPushButton('Delete Selected E-Mails', self)
+        rembtn.clicked.connect(self.removeItems)
+
+        self.addbtn = QtGui.QPushButton('Add Experimenter', self)
+        # self.addbtn.clicked.connect(self.add_expter)
+
+        server_name_l = QtGui.QLabel('Server Name: ')
+        self.server_name_edit = QtGui.QLineEdit()
+        self.server_name_edit.setText(self.smtp_data['ServerName'])
+        server_lay = QtGui.QHBoxLayout()
+        server_lay.addWidget(server_name_l)
+        server_lay.addWidget(self.server_name_edit)
+
+        port_l = QtGui.QLabel('Port: ')
+        self.port_edit = QtGui.QLineEdit()
+        self.port_edit.setText(self.smtp_data['Port'])
+        port_lay = QtGui.QHBoxLayout()
+        port_lay.addWidget(port_l)
+        port_lay.addWidget(self.port_edit)
+
+        pass_l = QtGui.QLabel('Password: ')
+        self.pass_edit = QtGui.QLineEdit()
+        self.pass_edit.setEchoMode(QtGui.QLineEdit.Password)
+        self.pass_edit.setText(self.smtp_data['Password'])
+        pass_lay = QtGui.QHBoxLayout()
+        pass_lay.addWidget(pass_l)
+        pass_lay.addWidget(self.pass_edit)
+
+        username_l = QtGui.QLabel('Username: ')
+        self.username_edit = QtGui.QLineEdit()
+        self.username_edit.setText(self.smtp_data['Username'])
+        username_lay = QtGui.QHBoxLayout()
+        username_lay.addWidget(username_l)
+        username_lay.addWidget(self.username_edit)
+
+        server_layout = QtGui.QHBoxLayout()
+        server_layout.addLayout(server_lay)
+        server_layout.addLayout(port_lay)
+
+        user_layout = QtGui.QHBoxLayout()
+        user_layout.addLayout(username_lay)
+        user_layout.addLayout(pass_lay)
+
+        self.notification_cb = QtGui.QCheckBox('Allow Email Notifications: ')
+        self.notification_cb.stateChanged.connect(self.NotificationStatus)
+
+        if self.smtp_data['Notification'] == 'Off':
+            self.server_name_edit.setDisabled(1)
+            self.port_edit.setDisabled(1)
+            self.pass_edit.setDisabled(1)
+            self.username_edit.setDisabled(1)
+        else:
+            self.notification_cb.toggle()
+            self.server_name_edit.setEnabled(1)
+            self.port_edit.setEnabled(1)
+            self.pass_edit.setEnabled(1)
+            self.username_edit.setEnabled(1)
+
+        # ------------------------ layout -----------------------
+        layout = QtGui.QVBoxLayout()
+
+        btn_layout = QtGui.QHBoxLayout()
+        btn_order = [applybtn, self.addbtn, rembtn, self.backbtn]
+
+        # btn_layout.addStretch(1)
+        for butn in btn_order:
+            btn_layout.addWidget(butn)
+            # btn_layout.addStretch(1)
+
+        layout_order = [self.notification_cb, server_layout, user_layout, self.expterList, btn_layout]
+
+        for order in layout_order:
+            if 'Layout' in order.__str__():
+                layout.addLayout(order)
+            else:
+                layout.addWidget(order)
+
+        self.setLayout(layout)
+
+        center(self)
+        # self.show()
+
+    def removeItems(self):
+        root = self.expterList.invisibleRootItem()
+        expter_fname = 'experimenter.json'
+        with open(expter_fname, 'r+') as f:
+            expters = json.load(f)
+        for item in self.expterList.selectedItems():
+            expters = {key: expters[key] for key in expters if key != item.text(0)}
+            (item.parent() or root).removeChild(item)
+
+        with open(expter_fname, 'w') as f:
+            json.dump(expters, f)
+
+    def editItems(self, item, column):
+        self.expterList.editItem(item, column)
+
+    def ApplyBtn(self):
+        with open(self.smtpfile, 'r+') as filename:
+            self.smtp_data = json.load(filename)
+
+        self.smtp_data['ServerName'] = str(self.server_name_edit.text())
+        self.smtp_data['Port'] = str(self.port_edit.text())
+        self.smtp_data['Password'] = str(self.pass_edit.text())
+        self.smtp_data['Username'] = str(self.username_edit.text())
+
+        expter_fname = 'experimenter.json'
+        with open(expter_fname, 'r+') as f:
+            expters = json.load(f)
+        root = self.expterList.invisibleRootItem()
+        child_count = root.childCount()
+        for i in range(child_count):
+            item = root.child(i)
+            expters[item.text(0)] = item.text(1)
+
+        with open(expter_fname, 'w') as f:
+            json.dump(expters, f)
+
+        with open(self.smtpfile, 'w') as filename:
+            json.dump(self.smtp_data, filename)
+
+            self.backbtn.animateClick()
+
+    def NotificationStatus(self):
+        # self.smtp_data = {}
+        with open(self.smtpfile, 'r+') as filename:
+            self.smtp_data = json.load(filename)
+
+        if self.notification_cb.isChecked():
+            self.smtp_data['Notification'] = 'On'
+            self.server_name_edit.setEnabled(1)
+            self.port_edit.setEnabled(1)
+            self.pass_edit.setEnabled(1)
+            self.username_edit.setEnabled(1)
+        else:
+            self.smtp_data['Notification'] = 'Off'
+            self.server_name_edit.setDisabled(1)
+            self.port_edit.setDisabled(1)
+            self.pass_edit.setDisabled(1)
+            self.username_edit.setDisabled(1)
+        with open(self.smtpfile, 'w') as filename:
+            json.dump(self.smtp_data, filename)
+
+class AddExpter(QtGui.QWidget):
+    def __init__(self):
+        super(AddExpter, self).__init__()
+        background(self)
+        # deskW, deskH = background.Background(self)
+        width = self.deskW / 3
+        height = self.deskH / 3
+        self.setGeometry(0, 0, width, height)
+        self.setWindowTitle("BatchTINT - Add Experimenter")
+
+        # ------------- widgets ---------------------------------------------------
+
+        self.cancelbtn = QtGui.QPushButton('Cancel', self)
+        self.addbtn = QtGui.QPushButton('Add', self)
+
+        self.backbtn = QtGui.QPushButton('Back', self)
+
+        expter_l = QtGui.QLabel('Experimenter: ')
+        self.expter_edit = QtGui.QLineEdit()
+        expter_lay = QtGui.QHBoxLayout()
+        expter_lay.addWidget(expter_l)
+        expter_lay.addWidget(self.expter_edit)
+
+        email_l = QtGui.QLabel('E-Mail: ')
+        email_l.setToolTip('Can add multiple e-mails (e-mails separated by a comma followed by a space)')
+        self.email_edit = QtGui.QLineEdit()
+        self.email_edit.setToolTip('Can add multiple e-mails (e-mails separated by a comma followed by a space)')
+        email_lay = QtGui.QHBoxLayout()
+        email_lay.addWidget(email_l)
+        email_lay.addWidget(self.email_edit)
+
+
+        # ------------------ layout ---------------------------------------------------------
+
+        layout = QtGui.QVBoxLayout()
+
+        btn_layout = QtGui.QHBoxLayout()
+        btn_order = [self.addbtn, self.backbtn, self.cancelbtn]
+
+        # btn_layout.addStretch(1)
+        for butn in btn_order:
+            btn_layout.addWidget(butn)
+            # btn_layout.addStretch(1)
+
+        layout_order = [expter_lay, email_lay, btn_layout]
+
+        for order in layout_order:
+            if 'Layout' in order.__str__():
+                layout.addLayout(order)
+            else:
+                layout.addWidget(order)
+
+        self.setLayout(layout)
+
+        center(self)
+
+
 @QtCore.pyqtSlot()
 def raise_w(new_window, old_window):
     """ raise the current window"""
@@ -980,6 +1238,18 @@ def raise_w(new_window, old_window):
     new_window.show()
     time.sleep(0.1)
     old_window.hide()
+
+@QtCore.pyqtSlot()
+def cancel_w(new_window, old_window):
+    """ raise the current window"""
+    new_window.raise_()
+    new_window.show()
+    time.sleep(0.1)
+    old_window.hide()
+
+    if 'SmtpSettings' in str(new_window) and 'AddExpter' in str(old_window): # needs to clear the text files
+        old_window.expter_edit.setText('')
+        old_window.email_edit.setText('')
 
 def center(self):
     """centers the window on the screen"""
@@ -1007,6 +1277,30 @@ def silent(self, state):
     with open(self.settings_fname, 'w') as filename:
         json.dump(settings, filename)
 
+@QtCore.pyqtSlot()
+def add_Expter(self, main):
+    expters = {}
+    expter_fname = 'experimenter.json'
+    try:
+        with open(expter_fname, 'r+') as f:
+            expters = json.load(f)
+            expters[str(self.expter_edit.text()).title()] = self.email_edit.text()
+        with open(expter_fname, 'w') as f:
+            json.dump(expters, f)
+
+    except FileNotFoundError:
+        with open(expter_fname, 'w') as f:
+            expters[str(self.expter_edit.text()).title()] = self.email_edit.text()
+            json.dump(expters, f)
+
+    new_item = QtGui.QTreeWidgetItem()
+    new_item.setFlags(new_item.flags() | QtCore.Qt.ItemIsEditable)
+    new_item.setText(0, str(self.expter_edit.text()).title())
+    new_item.setText(1, self.email_edit.text())
+    main.expterList.addTopLevelItem(new_item)
+
+    self.backbtn.animateClick()
+    self.cancelbtn.animateClick()
 
 def Multi(self, state):
     with open(self.settings_fname, 'r+') as filename:
@@ -1027,10 +1321,18 @@ def run():
     main_w = Window() # calling the main window
     choose_dir_w = Choose_Dir()  # calling the Choose Directory Window
     settings_w = Settings_W()  # calling the settings window
+    smtp_setting_w = SmtpSettings() # calling the smtp settings window
+    add_exper = AddExpter()
 
+    add_exper.addbtn.clicked.connect(lambda: add_Expter(add_exper, smtp_setting_w))
     choose_dir_w.cur_dir_name = main_w.cur_dir_name # synchs the current directory on the main window
 
     main_w.raise_()  # making the main window on top
+
+    add_exper.cancelbtn.clicked.connect(lambda: cancel_w(smtp_setting_w,add_exper))
+    add_exper.backbtn.clicked.connect(lambda: raise_w(smtp_setting_w,add_exper))
+
+    smtp_setting_w.addbtn.clicked.connect(lambda: raise_w(add_exper, smtp_setting_w))
 
     main_w.silent_cb.stateChanged.connect(lambda: silent(main_w, main_w.silent_cb.isChecked()))
     main_w.Multithread_cb.stateChanged.connect(lambda: Multi(main_w, main_w.Multithread_cb.isChecked()))
@@ -1044,6 +1346,10 @@ def run():
     main_w.setbtn.clicked.connect(lambda: raise_w(settings_w,main_w))
     #main_w.setbtn.clicked.connect(lambda: raise_w(settings_w))
 
+    main_w.smtpbtn.clicked.connect(lambda: raise_w(smtp_setting_w,main_w))
+
+    smtp_setting_w.backbtn.clicked.connect(lambda: raise_w(main_w, smtp_setting_w))
+
     settings_w.backbtn.clicked.connect(lambda: raise_w(main_w, settings_w))
     #settings_w.backbtn.clicked.connect(lambda: raise_w(main_w))
 
@@ -1052,6 +1358,8 @@ def run():
 
     choose_dir_w.dirbtn.clicked.connect(lambda: new_dir(choose_dir_w,main_w)) # promps the user to choose a directory
     #choose_dir_w.dirbtn.clicked.connect(lambda: new_dir(choose_dir_w))  # promps the user to choose a directory
+
+
 
     sys.exit(app.exec_()) # prevents the window from immediatley exiting out
 
