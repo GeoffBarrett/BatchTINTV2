@@ -158,10 +158,11 @@ class runKlusta():
                             experimenter.append(' '.join(expter_line))
                             break
 
+
                 while not q.empty():
                     Threads = []
                     for i in range(ThreadCount):
-                        t = threading.Thread(target=runKlusta.analyze_tet, args=(self, q, error, skipped_mat, i, set_path, set_file, f_list,
+                        t = threading.Thread(target=runKlusta.analyze_tet, args=(self, q, experimenter, error, skipped_mat, i, set_path, set_file, f_list,
                                                                                  dir_new, log_f_dir, ini_f_dir))
                         time.sleep(0.5)
                         t.daemon = True
@@ -279,7 +280,7 @@ class runKlusta():
         print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + prob_fin_msg)
         '''
 
-    def analyze_tet(self, q, error, skipped_mat, index, set_path, set_file, f_list, dir_new, log_f_dir, ini_f_dir):
+    def analyze_tet(self, q, experimenter, error, skipped_mat, index, set_path, set_file, f_list, dir_new, log_f_dir, ini_f_dir):
         '''
         self.settings_fname = 'settings.json'
 
@@ -402,6 +403,17 @@ class runKlusta():
                 log_fname = tet_fname + '_log.txt'
 
                 cmdline = ["cmd", "/q", "/k", "echo off"]
+                reading = 1
+                with open(tet_path, 'rb') as f:
+                    while reading == 1:
+                        line = f.readline()
+                        if 'experimenter ' in str(line):
+                            expter_line = str(line).split(' ', 1)
+                            expter_line.remove("b'experimenter")
+                            experimenter.append(' '.join(expter_line))
+                            reading = 0
+                        elif 'data_start' in str(line):
+                            reading = 0
 
                 # time.sleep(1)
 
