@@ -205,8 +205,12 @@ class runKlusta():
                             addresses = value.split(', ', 1)
                             for address in addresses:
                                 toaddrs.append(address)
-                        if ', ' in value:
+                        elif ', ' in value:
                             addresses = value.split(', ', 1)
+                            for address in addresses:
+                                toaddrs.append(address)
+                        else:
+                            addresses = [value]
                             for address in addresses:
                                 toaddrs.append(address)
 
@@ -257,10 +261,16 @@ class runKlusta():
                     email_sent_msg = ': successfully sent e-mail!'
                     print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + email_sent_msg)
                 except:
-                    cur_date = datetime.datetime.now().date()
-                    cur_time = datetime.datetime.now().time()
-                    email_failed_msg = ': failed to send e-mail, could be due to security settings of your e-mail!'
-                    print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + email_failed_msg)
+                    if toaddrs == []:
+                        cur_date = datetime.datetime.now().date()
+                        cur_time = datetime.datetime.now().time()
+                        email_failed_msg = ': failed to send e-mail, could not establish an address to send the e-mail to!'
+                        print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + email_failed_msg)
+                    else:
+                        cur_date = datetime.datetime.now().date()
+                        cur_time = datetime.datetime.now().time()
+                        email_failed_msg = ': failed to send e-mail, could be due to security settings of your e-mail!'
+                        print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + email_failed_msg)
 
         proc_f_dir = os.path.join(directory, 'Processed')
         processing = 1
