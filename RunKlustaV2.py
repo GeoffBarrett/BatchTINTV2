@@ -158,10 +158,11 @@ class runKlusta():
                             experimenter.append(' '.join(expter_line))
                             break
 
+
                 while not q.empty():
                     Threads = []
                     for i in range(ThreadCount):
-                        t = threading.Thread(target=runKlusta.analyze_tet, args=(self, q, error, skipped_mat, i, set_path, set_file, f_list,
+                        t = threading.Thread(target=runKlusta.analyze_tet, args=(self, q, experimenter, error, skipped_mat, i, set_path, set_file, f_list,
                                                                                  dir_new, log_f_dir, ini_f_dir))
                         time.sleep(0.5)
                         t.daemon = True
@@ -204,8 +205,12 @@ class runKlusta():
                             addresses = value.split(', ', 1)
                             for address in addresses:
                                 toaddrs.append(address)
-                        if ', ' in value:
+                        elif ', ' in value:
                             addresses = value.split(', ', 1)
+                            for address in addresses:
+                                toaddrs.append(address)
+                        else:
+                            addresses = [value]
                             for address in addresses:
                                 toaddrs.append(address)
 
@@ -256,10 +261,16 @@ class runKlusta():
                     email_sent_msg = ': successfully sent e-mail!'
                     print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + email_sent_msg)
                 except:
-                    cur_date = datetime.datetime.now().date()
-                    cur_time = datetime.datetime.now().time()
-                    email_failed_msg = ': failed to send e-mail, could be due to security settings of your e-mail!'
-                    print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + email_failed_msg)
+                    if toaddrs == []:
+                        cur_date = datetime.datetime.now().date()
+                        cur_time = datetime.datetime.now().time()
+                        email_failed_msg = ': failed to send e-mail, could not establish an address to send the e-mail to!'
+                        print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + email_failed_msg)
+                    else:
+                        cur_date = datetime.datetime.now().date()
+                        cur_time = datetime.datetime.now().time()
+                        email_failed_msg = ': failed to send e-mail, could be due to security settings of your e-mail!'
+                        print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + email_failed_msg)
 
         proc_f_dir = os.path.join(directory, 'Processed')
         processing = 1
@@ -279,7 +290,7 @@ class runKlusta():
         print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + prob_fin_msg)
         '''
 
-    def analyze_tet(self, q, error, skipped_mat, index, set_path, set_file, f_list, dir_new, log_f_dir, ini_f_dir):
+    def analyze_tet(self, q, experimenter, error, skipped_mat, index, set_path, set_file, f_list, dir_new, log_f_dir, ini_f_dir):
         '''
         self.settings_fname = 'settings.json'
 
@@ -402,6 +413,17 @@ class runKlusta():
                 log_fname = tet_fname + '_log.txt'
 
                 cmdline = ["cmd", "/q", "/k", "echo off"]
+                reading = 1
+                with open(tet_path, 'rb') as f:
+                    while reading == 1:
+                        line = f.readline()
+                        if 'experimenter ' in str(line):
+                            expter_line = str(line).split(' ', 1)
+                            expter_line.remove("b'experimenter")
+                            experimenter.append(' '.join(expter_line))
+                            reading = 0
+                        elif 'data_start' in str(line):
+                            reading = 0
 
                 time.sleep(1)
 
