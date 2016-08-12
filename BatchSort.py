@@ -182,7 +182,6 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
 
         self.show()  # shows the widget
 
-
     def run_klusta(self, directory):  # function that runs klustakwik
         klusta_ready = True
         with open(self.settings_fname, 'r+') as filename:
@@ -223,7 +222,6 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
             elif directory_msg == QtGui.QMessageBox.No:
                 klusta_ready = False
 
-
         elif klusta_ready:
             self.hide()
             cur_date = datetime.datetime.now().date()
@@ -235,6 +233,12 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
 
             expt_list = os.listdir(directory)   # finds the files within the directory
             if len(expt_list) == 1 and expt_list[0] == 'Processed':
+                cur_date = datetime.datetime.now().date()
+                cur_time = datetime.datetime.now().time()
+                no_files_dir_msg = ': There are no files to analyze in this directory!'  # message that shows how many files were found
+                print('[' + str(cur_date) + ' ' + str(cur_time)[:8] + ']' + no_files_dir_msg)  # prints message
+                pass
+            elif len(expt_list) == 1 and expt_list[0] == 'Converted':
                 cur_date = datetime.datetime.now().date()
                 cur_time = datetime.datetime.now().time()
                 no_files_dir_msg = ': There are no files to analyze in this directory!'  # message that shows how many files were found
@@ -256,6 +260,8 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                     f_list = os.listdir(dir_new)  # finds the files within that directory
                     set_file = [file for file in f_list if '.set' in file] # finds the set file
                     if expt == 'Processed':
+                        continue
+                    elif expt == 'Converted':
                         continue
                     elif set_file == []: # if there is no set file it will return as an empty list
                         cur_date = datetime.datetime.now().date()
@@ -285,20 +291,20 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
             # creation of a while loop that will constantly check for new folders added to the directory
             while True:
                 newmtime = os.stat(directory).st_mtime  # finds the new modification time
-                if newmtime != dirmtime:  # only execute if the new mod time doens't equal the old mod time
+                if newmtime != dirmtime:  # only execute if the new mod time doesn't equal the old mod time
                     dirmtime = newmtime  # sets the mod time to the new mod time for future iterations
                     newcontents = os.listdir(directory)  # lists the new contents of the directory including added folders
                     added = list(set(newcontents).difference(contents)) # finds the differences between the contents to state the files that were added
                     # added = list(added) #converts added to a list
                     if added:  # runs if added exists as a variable
 
-                        for new_file in added: # cycles through the added files to analyze
-
+                        for new_file in added:  # cycles through the added files to analyze
                             if new_file == 'Processed':
                                 continue
-
+                            elif new_file == 'Converted':
+                                continue
                             start_path = os.path.join(directory, new_file)
-                            total_size = 0
+                            # total_size = 0
                             total_size_old = 0
                             file_complete = 0
                             count_old = 0
@@ -306,7 +312,7 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                             while file_complete == 0:
                                 total_size = 0
                                 count_old = len(start_path)
-                                # come up with way to have python wait until all the files have been transferred to the directory
+
                                 for dirpath, dirnames, filenames in os.walk(start_path):
                                     for f in filenames:
                                         fp = os.path.join(dirpath, f)
@@ -358,8 +364,8 @@ class Window(QtGui.QWidget):  # defines the window class (main window)
                 elif :
                     return False
                 '''
-                # time.sleep(30) #checks every 30 seconds
-                time.sleep(1)  # checks every 30 seconds
+                time.sleep(30) #checks every 30 seconds
+                #time.sleep(1)  # checks every 30 seconds
 
     def close_app(self):
         # pop up window that asks if you really want to exit the app ------------------------------------------------
@@ -418,7 +424,6 @@ class Settings_W(QtGui.QTabWidget):
         self.clust_ft_names = ['PC1', 'PC2', 'PC3', 'PC4',
                                'A', 'Vt', 'P', 'T',
                                'tP', 'tT', 'En', 'Ar']
-
 
         for feat in self.clust_ft_names:
             if feat != '':
@@ -600,7 +605,6 @@ class Settings_W(QtGui.QTabWidget):
 
         self.apply_tab2btn = QtGui.QPushButton('Apply',tab2)
         self.apply_tab2btn.clicked.connect(self.apply_tab2)
-
 
         basic_butn_order = [self.apply_tab1btn, self.basicdefaultbtn, self.backbtn]
         basic_butn_lay = QtGui.QHBoxLayout()
@@ -895,7 +899,7 @@ class Choose_Dir(QtGui.QWidget):
         height = self.deskH / 5
         self.setGeometry(0, 0, width, height)
 
-        self.dirfile = 'directory.json' # defining the directory filename
+        self.dirfile = 'directory.json'  # defining the directory filename
 
         with open(self.dirfile, 'r+') as filename:
             dir_data = json.load(filename)
@@ -916,7 +920,6 @@ class Choose_Dir(QtGui.QWidget):
         self.cur_dir_e.setText(cur_dir_name)
         self.cur_dir_e.setAlignment(QtCore.Qt.AlignHCenter)
         self.cur_dir_name = cur_dir_name
-
 
         self.backbtn = QtGui.QPushButton('Back',self)
         applybtn = QtGui.QPushButton('Apply', self)
@@ -1034,7 +1037,7 @@ class SmtpSettings(QtGui.QWidget):
         applybtn = QtGui.QPushButton('Apply', self)
         applybtn.clicked.connect(self.ApplyBtn)
 
-        rembtn = QtGui.QPushButton('Delete Selected E-Mails', self)
+        rembtn = QtGui.QPushButton('Delete Selected Experimenters', self)
         rembtn.clicked.connect(self.removeItems)
 
         self.addbtn = QtGui.QPushButton('Add Experimenter', self)
@@ -1177,6 +1180,7 @@ class SmtpSettings(QtGui.QWidget):
         with open(self.smtpfile, 'w') as filename:
             json.dump(self.smtp_data, filename)
 
+
 class AddExpter(QtGui.QWidget):
     def __init__(self):
         super(AddExpter, self).__init__()
@@ -1242,6 +1246,7 @@ def raise_w(new_window, old_window):
     time.sleep(0.1)
     old_window.hide()
 
+
 @QtCore.pyqtSlot()
 def cancel_w(new_window, old_window):
     """ raise the current window"""
@@ -1253,6 +1258,7 @@ def cancel_w(new_window, old_window):
     if 'SmtpSettings' in str(new_window) and 'AddExpter' in str(old_window): # needs to clear the text files
         old_window.expter_edit.setText('')
         old_window.email_edit.setText('')
+
 
 def center(self):
     """centers the window on the screen"""
@@ -1270,6 +1276,7 @@ def new_dir(self,main):
     main.cur_dir.setText(cur_dir_name)
     main.cur_dir_name = cur_dir_name
 
+
 def silent(self, state):
     with open(self.settings_fname, 'r+') as filename:
         settings = json.load(filename)
@@ -1279,6 +1286,7 @@ def silent(self, state):
             settings['Silent'] = 0
     with open(self.settings_fname, 'w') as filename:
         json.dump(settings, filename)
+
 
 @QtCore.pyqtSlot()
 def add_Expter(self, main):
@@ -1305,6 +1313,7 @@ def add_Expter(self, main):
     self.backbtn.animateClick()
     self.cancelbtn.animateClick()
 
+
 def Multi(self, state):
     with open(self.settings_fname, 'r+') as filename:
         settings = json.load(filename)
@@ -1318,6 +1327,8 @@ def Multi(self, state):
         json.dump(settings, filename)
 
 # ------- making a function that runs the entire GUI ----------
+
+
 def run():
     app = QtGui.QApplication(sys.argv)
 
@@ -1328,7 +1339,7 @@ def run():
     add_exper = AddExpter()
 
     add_exper.addbtn.clicked.connect(lambda: add_Expter(add_exper, smtp_setting_w))
-    choose_dir_w.cur_dir_name = main_w.cur_dir_name # synchs the current directory on the main window
+    choose_dir_w.cur_dir_name = main_w.cur_dir_name  # synchs the current directory on the main window
 
     main_w.raise_()  # making the main window on top
 
@@ -1340,30 +1351,28 @@ def run():
     main_w.silent_cb.stateChanged.connect(lambda: silent(main_w, main_w.silent_cb.isChecked()))
     main_w.Multithread_cb.stateChanged.connect(lambda: Multi(main_w, main_w.Multithread_cb.isChecked()))
 
-    main_w.choose_dir.clicked.connect(lambda: raise_w(choose_dir_w,main_w)) # brings the directory window to the foreground
-    #main_w.choose_dir.clicked.connect(lambda: raise_w(choose_dir_w))
+    main_w.choose_dir.clicked.connect(lambda: raise_w(choose_dir_w,main_w))  # brings the directory window to the foreground
+    # main_w.choose_dir.clicked.connect(lambda: raise_w(choose_dir_w))
 
-    choose_dir_w.backbtn.clicked.connect(lambda: raise_w(main_w,choose_dir_w)) # brings the main window to the foreground
-    #choose_dir_w.backbtn.clicked.connect(lambda: raise_w(main_w))  # brings the main window to the foreground
+    choose_dir_w.backbtn.clicked.connect(lambda: raise_w(main_w,choose_dir_w))  # brings the main window to the foreground
+    # choose_dir_w.backbtn.clicked.connect(lambda: raise_w(main_w))  # brings the main window to the foreground
 
     main_w.setbtn.clicked.connect(lambda: raise_w(settings_w,main_w))
-    #main_w.setbtn.clicked.connect(lambda: raise_w(settings_w))
+    # main_w.setbtn.clicked.connect(lambda: raise_w(settings_w))
 
     main_w.smtpbtn.clicked.connect(lambda: raise_w(smtp_setting_w,main_w))
 
     smtp_setting_w.backbtn.clicked.connect(lambda: raise_w(main_w, smtp_setting_w))
 
     settings_w.backbtn.clicked.connect(lambda: raise_w(main_w, settings_w))
-    #settings_w.backbtn.clicked.connect(lambda: raise_w(main_w))
+    # settings_w.backbtn.clicked.connect(lambda: raise_w(main_w))
 
     settings_w.backbtn2.clicked.connect(lambda: raise_w(main_w, settings_w))
-    #settings_w.backbtn2.clicked.connect(lambda: raise_w(main_w))
+    # settings_w.backbtn2.clicked.connect(lambda: raise_w(main_w))
 
-    choose_dir_w.dirbtn.clicked.connect(lambda: new_dir(choose_dir_w,main_w)) # promps the user to choose a directory
-    #choose_dir_w.dirbtn.clicked.connect(lambda: new_dir(choose_dir_w))  # promps the user to choose a directory
+    choose_dir_w.dirbtn.clicked.connect(lambda: new_dir(choose_dir_w,main_w)) # prompts the user to choose a directory
+    # choose_dir_w.dirbtn.clicked.connect(lambda: new_dir(choose_dir_w))  # prompts the user to choose a directory
 
+    sys.exit(app.exec_())  # prevents the window from immediatley exiting out
 
-
-    sys.exit(app.exec_()) # prevents the window from immediatley exiting out
-
-run() # the command that calls run()
+run()  # the command that calls run()

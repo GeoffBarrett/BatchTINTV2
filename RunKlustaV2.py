@@ -403,7 +403,7 @@ class runKlusta():
 
                 cmdline = ["cmd", "/q", "/k", "echo off"]
 
-                # time.sleep(1)
+                time.sleep(1)
 
                 cmd = subprocess.Popen(cmdline, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
