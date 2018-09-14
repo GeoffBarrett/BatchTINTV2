@@ -1,6 +1,6 @@
 # OUTDATED
 
-Please go to the new repo for [BatchTINTV3](https://github.com/ephyslab/BatchTINTV3)
+Please go to the new repo for [BatchTINTV3](https://github.com/HussainiLab/BatchTINTV3)
 
 # About BatchTINTV2
 New Update as of 6/23/2016 10:00 AM EST, re-clone to fix some of the bugs
